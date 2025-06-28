@@ -87,6 +87,7 @@ export default function DashboardPage() {
 
   const calorieProgress =
     calorieGoal > 0 ? (totalCalories / calorieGoal) * 100 : 0;
+  const remainingCalories = Math.max(0, calorieGoal - totalCalories);
 
   const macroData = [
     { name: t('dashboard.nutrients.protein'), value: totalProtein, fill: 'var(--color-protein)' },
@@ -132,6 +133,11 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <div className="flex justify-between font-medium">
                 <span>{t('dashboard.calorieCard.consumed', { consumed: Math.round(totalCalories)})}</span>
+                <span className="font-bold text-primary">
+                  {t('dashboard.calorieCard.remaining', {
+                    remaining: Math.round(remainingCalories),
+                  })}
+                </span>
                 <span className="text-muted-foreground">
                   {t('dashboard.calorieCard.goal', {goal: calorieGoal})}
                 </span>

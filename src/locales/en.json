@@ -26,6 +26,7 @@
       "button": "Set Goal",
       "consumed": "Consumed {{consumed}} kcal",
       "goal": "Goal {{goal}} kcal",
+      "remaining": "{{remaining}} kcal Remaining",
       "progressLabel": "{{progress}}% of calorie goal"
     },
     "macroCard": {

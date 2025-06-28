@@ -26,6 +26,7 @@
       "button": "تحديد الهدف",
       "consumed": "استهلكت {{consumed}} سعرة حرارية",
       "goal": "الهدف {{goal}} سعرة حرارية",
+      "remaining": "متبقي {{remaining}} سعرة حرارية",
       "progressLabel": "{{progress}}% من هدف السعرات الحرارية"
     },
     "macroCard": {
