@@ -38,18 +38,30 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are an automated nutrition analysis service. Your ONLY function is to return a JSON object.
+  prompt: `You are an expert nutritionist AI. Your task is to analyze the provided dish name and return a detailed nutritional breakdown in a specific JSON format.
 
-Based on the user's input, perform a nutritional analysis.
+**IMPORTANT RULES:**
+1.  Your entire response MUST be a single, valid JSON object.
+2.  Do NOT include any text, explanation, or markdown formatting (like \`\`\`json) before or after the JSON object.
+3.  Your response MUST start with \`{\` and end with \`}\`.
+4.  If a nutritional value cannot be reasonably estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
+5.  If the input does not seem to be a food item, you MUST return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
 
-**Rules:**
-- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
-- The JSON object must strictly match the provided schema.
-- If a nutritional value cannot be estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
-- If the input does not appear to be a food item, return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
-- All nutritional values MUST be numbers. Do not include units like "g" or "kcal".
+**EXAMPLE:**
+- **Input:** \`{ "dishName": "Avocado Toast", "portionSize": "2 slices" }\`
+- **Output:**
+{
+  "foodItems": ["avocado", "whole wheat toast", "olive oil"],
+  "estimatedCalories": 350,
+  "protein": 10,
+  "carbs": 30,
+  "fat": 20,
+  "fiber": 12,
+  "sugar": 2,
+  "sodium": 300
+}
 
-**Input to Analyze:**
+**USER'S REQUEST TO ANALYZE:**
 - Name: {{{dishName}}}
 {{#if portionSize}}
 - Portion Size: {{{portionSize}}}
@@ -84,12 +96,18 @@ const analyzeDishNameFlow = ai.defineFlow(
     outputSchema: FoodAnalysisOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    if (!output || !output.foodItems) {
-      // If the output is invalid or doesn't contain the required foodItems key,
-      // return a minimal, valid object.
+    try {
+      const {output} = await prompt(input);
+      if (!output || !output.foodItems) {
+        // If the output is invalid or doesn't contain the required foodItems key,
+        // return a minimal, valid object.
+        return { foodItems: [] };
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in analyzeDishNameFlow:", error);
+      // On any error, return a safe, empty object to prevent crashes.
       return { foodItems: [] };
     }
-    return output;
   }
 );

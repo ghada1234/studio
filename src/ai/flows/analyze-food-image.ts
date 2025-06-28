@@ -41,18 +41,25 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are an automated nutrition analysis service. Your ONLY function is to return a JSON object.
+  prompt: `You are an expert nutritionist AI. Your task is to analyze the provided food image and return a detailed nutritional breakdown in a specific JSON format.
 
-Based on the user's input image, perform a nutritional analysis.
+**IMPORTANT RULES:**
+1.  Your entire response MUST be a single, valid JSON object.
+2.  Do NOT include any text, explanation, or markdown formatting (like \`\`\`json) before or after the JSON object.
+3.  Your response MUST start with \`{\` and end with \`}\`.
+4.  If a nutritional value cannot be reasonably estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
+5.  If the image does not appear to contain food, you MUST return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
 
-**Rules:**
-- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
-- The JSON object must strictly match the provided schema.
-- If a nutritional value cannot be estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
-- If the image does not appear to contain food, return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
-- All nutritional values MUST be numbers. Do not include units like "g" or "kcal".
+**EXAMPLE OUTPUT FORMAT:**
+{
+  "foodItems": ["grilled chicken breast", "steamed broccoli", "brown rice"],
+  "estimatedCalories": 500,
+  "protein": 45,
+  "carbs": 40,
+  "fat": 15
+}
 
-**Input to Analyze:**
+**USER'S REQUEST TO ANALYZE:**
 {{media url=photoDataUri}}
 {{#if portionSize}}
 - Portion Size: {{{portionSize}}}
@@ -87,12 +94,18 @@ const analyzeFoodImageFlow = ai.defineFlow(
     outputSchema: FoodAnalysisOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    if (!output || !output.foodItems) {
-      // If the output is invalid or doesn't contain the required foodItems key,
-      // return a minimal, valid object.
+    try {
+      const {output} = await prompt(input);
+      if (!output || !output.foodItems) {
+        // If the output is invalid or doesn't contain the required foodItems key,
+        // return a minimal, valid object.
+        return { foodItems: [] };
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in analyzeFoodImageFlow:", error);
+      // On any error, return a safe, empty object to prevent crashes.
       return { foodItems: [] };
     }
-    return output;
   }
 );

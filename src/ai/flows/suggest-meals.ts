@@ -46,16 +46,26 @@ const prompt = ai.definePrompt({
   name: 'suggestMealsPrompt',
   input: {schema: SuggestMealsInputSchema},
   output: {schema: SuggestMealsOutputSchema},
-  prompt: `You are an automated meal suggestion service. Your ONLY function is to return a JSON object.
+  prompt: `You are an expert meal planning AI. Your task is to suggest meals based on the user's requirements and return them in a specific JSON format.
 
-Based on the user's requirements, generate a list of meal suggestions.
+**IMPORTANT RULES:**
+1.  Your entire response MUST be a single, valid JSON object.
+2.  Do NOT include any text, explanation, or markdown formatting (like \`\`\`json) before or after the JSON object.
+3.  Your response MUST start with \`{\` and end with \`}\`.
+4.  If you cannot generate suggestions for any reason, you MUST return a JSON object with an empty "meals" array: \`{"meals": []}\`.
+5.  If calorie estimates are requested, they MUST be included in the meal string like this: "Meal Name (~XXX calories)".
 
-**Rules:**
-- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
-- The JSON object must strictly match the provided schema.
-- If you cannot generate suggestions for any reason, return a JSON object with an empty "meals" array: \`{"meals": []}\`.
+**EXAMPLE:**
+- **Input:** \`{ "dietaryPreferences": "vegetarian", "nutrientNeeds": "high protein", "numberOfMeals": 2, "remainingCalories": 800 }\`
+- **Output:**
+{
+  "meals": [
+    "Lentil Soup with Whole Wheat Bread (~400 calories)",
+    "Tofu Stir-fry with Brown Rice and Mixed Vegetables (~400 calories)"
+  ]
+}
 
-**User's Requirements:**
+**USER'S REQUIREMENTS:**
 - Dietary Preferences: {{{dietaryPreferences}}}
 - Nutrient Needs: {{{nutrientNeeds}}}
 {{#if dislikedIngredients}}
@@ -64,7 +74,6 @@ Based on the user's requirements, generate a list of meal suggestions.
 {{#if remainingCalories}}
 - Remaining Calorie Budget: {{{remainingCalories}}} kcal for all suggested meals combined.
 - The total calories of all suggested meals MUST NOT exceed the remaining calorie budget.
-- Each meal suggestion MUST include an estimated calorie count. For example: "Grilled Salmon with Asparagus (~450 calories)".
 {{/if}}
 
 **Task:**
@@ -79,12 +88,18 @@ const suggestMealsFlow = ai.defineFlow(
     outputSchema: SuggestMealsOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    // If the output is invalid or doesn't contain the meals array,
-    // return an empty list of meals to prevent frontend errors.
-    if (!output || !Array.isArray(output.meals)) {
-      return {meals: []};
+    try {
+      const {output} = await prompt(input);
+      // If the output is invalid or doesn't contain the meals array,
+      // return an empty list of meals to prevent frontend errors.
+      if (!output || !Array.isArray(output.meals)) {
+        return {meals: []};
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in suggestMealsFlow:", error);
+      // On any error, return a safe, empty object to prevent crashes.
+      return { meals: [] };
     }
-    return output;
   }
 );
