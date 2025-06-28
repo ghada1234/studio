@@ -15,10 +15,23 @@ const firebaseConfig = {
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 
-// Only initialize if the API key is not a placeholder
-if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your-api-key') {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
+// Only initialize if the config is valid and not using placeholder values.
+// This prevents the app from crashing on the server if the .env file is not configured.
+if (
+  firebaseConfig.apiKey &&
+  !firebaseConfig.apiKey.includes('your-api-key') &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId
+) {
+  try {
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+    auth = getAuth(app);
+  } catch (e) {
+    console.error('Failed to initialize Firebase', e);
+    // Keep app and auth as null if initialization fails
+    app = null;
+    auth = null;
+  }
 }
 
 export { app, auth };
