@@ -41,38 +41,27 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are an expert nutritionist API. Your only function is to analyze a food image and return a JSON object with nutritional information.
+  prompt: `Analyze the nutritional content of the meal in the following image.
 
-**Input Image:**
-{{media url=photoDataUri}}
-
+Image: {{media url=photoDataUri}}
 {{#if portionSize}}
-**User-provided Portion Size:**
-{{{portionSize}}}
+Portion: {{{portionSize}}}
 {{/if}}
 
-**Your Task:**
-1.  Analyze the image to identify all food items.
-2.  Estimate the nutritional content for the meal. If a portion size is provided by the user, base your estimates on that. Otherwise, estimate from the image.
-3.  If the image does not contain food, you MUST return a JSON object with "foodItems": [] and all other numeric values set to 0.
-4.  **You MUST respond with ONLY a valid JSON object** that strictly adheres to the following structure. Do not include any introductory text, explanations, or markdown formatting.
+Your task is to return ONLY a valid JSON object with the nutritional analysis.
+- Identify the food items in the image.
+- Estimate the nutritional values. Use the provided portion size if available, otherwise estimate from the image.
+- All nutritional values must be numbers, not strings. Do not include units in the JSON values.
+- If the image does not contain food, return a JSON object with an empty "foodItems" array and all other values as 0.
+- Do not add any text before or after the JSON object.
 
-**JSON Output Structure:**
+Example of a valid response for an image of a salad:
 {
-  "foodItems": ["string"],
-  "estimatedCalories": "number (optional)",
-  "protein": "number (optional, in grams)",
-  "carbs": "number (optional, in grams)",
-  "fat": "number (optional, in grams)",
-  "fiber": "number (optional, in grams)",
-  "sugar": "number (optional, in grams)",
-  "sodium": "number (optional, in mg)",
-  "potassium": "number (optional, in mg)",
-  "calcium": "number (optional, in mg)",
-  "iron": "number (optional, in mg)",
-  "vitaminA": "number (optional, in mcg RAE)",
-  "vitaminC": "number (optional, in mg)",
-  "vitaminD": "number (optional, in mcg)"
+  "foodItems": ["lettuce", "tomato", "cucumber", "chicken breast", "croutons", "caesar dressing"],
+  "estimatedCalories": 350,
+  "protein": 25,
+  "carbs": 15,
+  "fat": 20
 }
 `,
   config: {

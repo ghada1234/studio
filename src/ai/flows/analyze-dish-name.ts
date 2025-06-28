@@ -38,38 +38,27 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are an expert nutritionist API. Your only function is to analyze a dish name and return a JSON object with nutritional information.
+  prompt: `Analyze the nutritional content of the following dish.
 
-**Input Dish Name:**
-{{{dishName}}}
-
+Dish: {{{dishName}}}
 {{#if portionSize}}
-**User-provided Portion Size:**
-{{{portionSize}}}
+Portion: {{{portionSize}}}
 {{/if}}
 
-**Your Task:**
-1.  Analyze the dish name to identify its ingredients.
-2.  Estimate the nutritional content for the dish. If a portion size is provided, base your estimates on that. Otherwise, assume a standard single serving.
-3.  If the input is not a food item, you MUST return a JSON object with "foodItems": [] and all other numeric values set to 0.
-4.  **You MUST respond with ONLY a valid JSON object** that strictly adheres to the following structure. Do not include any introductory text, explanations, or markdown formatting.
+Your task is to return ONLY a valid JSON object with the nutritional analysis.
+- Identify the food items.
+- Estimate the nutritional values. Use the provided portion size if available, otherwise assume a standard serving.
+- All nutritional values must be numbers, not strings. Do not include units in the JSON values.
+- If the input is not a recognizable food, return a JSON object with an empty "foodItems" array and all other values as 0.
+- Do not add any text before or after the JSON object.
 
-**JSON Output Structure:**
+Example of a valid response for "A slice of cheese pizza":
 {
-  "foodItems": ["string"],
-  "estimatedCalories": "number (optional)",
-  "protein": "number (optional, in grams)",
-  "carbs": "number (optional, in grams)",
-  "fat": "number (optional, in grams)",
-  "fiber": "number (optional, in grams)",
-  "sugar": "number (optional, in grams)",
-  "sodium": "number (optional, in mg)",
-  "potassium": "number (optional, in mg)",
-  "calcium": "number (optional, in mg)",
-  "iron": "number (optional, in mg)",
-  "vitaminA": "number (optional, in mcg RAE)",
-  "vitaminC": "number (optional, in mg)",
-  "vitaminD": "number (optional, in mcg)"
+  "foodItems": ["pizza crust", "tomato sauce", "cheese"],
+  "estimatedCalories": 285,
+  "protein": 12,
+  "carbs": 36,
+  "fat": 10
 }
 `,
   config: {
