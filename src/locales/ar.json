@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -79,7 +80,8 @@
     },
     "tabs": {
       "image": "بالصورة",
-      "search": "بالاسم"
+      "search": "بالاسم",
+      "camera": "بالكاميرا"
     },
     "uploadCard": {
       "description": "اختر صورة واضحة لوجبتك.",
@@ -96,6 +98,13 @@
       "button": "ابحث عن الطبق",
       "error_no_dish_title": "لم يتم إدخال اسم الطبق",
       "error_no_dish_description": "الرجاء إدخال اسم طبق للبحث."
+    },
+    "cameraCard": {
+      "description": "وجّه الكاميرا نحو وجبتك والتقط صورة.",
+      "button_loading": "يتم التحليل...",
+      "button": "التقاط وتحليل",
+      "error_permission_title": "تم رفض الوصول إلى الكاميرا",
+      "error_permission_description": "الرجاء تمكين أذونات الكاميرا في إعدادات متصفحك لاستخدام هذه الميزة."
     },
     "reviewCard": {
       "title": "2. مراجعة التحليل",
