@@ -39,7 +39,7 @@ Based on a typical preparation of this dish, provide an estimation of the total 
 - Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
 - Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
 
-For the 'foodItems' field, list the typical ingredients for this dish.
+For the 'foodItems' field, list the typical ingredients for this dish. If you cannot identify the dish, make a best-effort guess based on the words in the name and set the 'foodItems' to reflect your guess.
 
 Return the data in the specified JSON format.
 `,

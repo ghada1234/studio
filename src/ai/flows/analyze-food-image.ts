@@ -40,13 +40,13 @@ const prompt = ai.definePrompt({
 
 Photo: {{media url=photoDataUri}}
 
-Identify the food items in the image.
+Identify the food items in the image. If you cannot identify a food item, state that it is an "unidentified food item".
 Provide an estimation of the total calories.
 Provide an estimation for the following nutrients:
 - Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
 - Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
 
-Return the data in the specified JSON format.
+Return the data in the specified JSON format. If the image does not contain food, return an empty list for 'foodItems' and 0 for all nutrient values.
 `,
 });
 
