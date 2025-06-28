@@ -65,6 +65,11 @@ export default function AnalyzePage() {
 
   useEffect(() => {
     if (activeTab !== 'camera') {
+      if (videoRef.current?.srcObject) {
+        const mediaStream = videoRef.current.srcObject as MediaStream;
+        mediaStream.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
+      }
       return;
     }
 
@@ -93,13 +98,12 @@ export default function AnalyzePage() {
     getCameraPermission();
 
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const mediaStream = videoRef.current.srcObject as MediaStream;
-        mediaStream.getTracks().forEach((track) => track.stop());
-        videoRef.current.srcObject = null;
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
       }
     };
   }, [activeTab, facingMode, t, toast]);
+
 
   if (authLoading || !user) {
     return (
@@ -172,7 +176,7 @@ export default function AnalyzePage() {
 
   const handleCaptureAndAnalyze = async () => {
     if (!videoRef.current || !canvasRef.current) return;
-
+  
     const video = videoRef.current;
     if (video.readyState < video.HAVE_ENOUGH_DATA) {
       toast({
@@ -182,7 +186,7 @@ export default function AnalyzePage() {
       });
       return;
     }
-
+  
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -191,7 +195,7 @@ export default function AnalyzePage() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUri = canvas.toDataURL('image/jpeg');
       setPreviewUrl(dataUri);
-      setDishName('');
+      setDishName(''); // Clear dish name when analyzing image
       await analyzeImageDataUri(dataUri, portionSize);
     }
   };
@@ -204,19 +208,19 @@ export default function AnalyzePage() {
         result.foodItems.join(', ') ||
         dishName ||
         t('analyze.analyzedMealName'),
-      calories: result.estimatedCalories,
-      protein: result.protein,
-      carbs: result.carbs,
-      fat: result.fat,
-      fiber: result.fiber,
-      sugar: result.sugar,
-      sodium: result.sodium,
-      potassium: result.potassium,
-      calcium: result.calcium,
-      iron: result.iron,
-      vitaminA: result.vitaminA,
-      vitaminC: result.vitaminC,
-      vitaminD: result.vitaminD,
+      calories: result.estimatedCalories ?? 0,
+      protein: result.protein ?? 0,
+      carbs: result.carbs ?? 0,
+      fat: result.fat ?? 0,
+      fiber: result.fiber ?? 0,
+      sugar: result.sugar ?? 0,
+      sodium: result.sodium ?? 0,
+      potassium: result.potassium ?? 0,
+      calcium: result.calcium ?? 0,
+      iron: result.iron ?? 0,
+      vitaminA: result.vitaminA ?? 0,
+      vitaminC: result.vitaminC ?? 0,
+      vitaminD: result.vitaminD ?? 0,
       imageUrl: previewUrl || undefined,
     });
 
@@ -429,7 +433,7 @@ export default function AnalyzePage() {
                     {t('analyze.reviewCard.estimatedCalories')}
                   </h3>
                   <p className="text-sm text-primary font-bold">
-                    ~{result.estimatedCalories} {t('dashboard.units.kcal')}
+                    ~{result.estimatedCalories ?? 0} {t('dashboard.units.kcal')}
                   </p>
                 </div>
 
@@ -442,73 +446,73 @@ export default function AnalyzePage() {
                       {t('dashboard.nutrients.protein')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.protein?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.protein ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.carbs')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.carbs?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.carbs ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.fat')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.fat?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.fat ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.fiber')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.fiber?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.fiber ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.sugar')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.sugar?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.sugar ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.sodium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.sodium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.sodium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.potassium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.potassium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.potassium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.calcium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.calcium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.calcium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.iron')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.iron?.toFixed(1)} {t('dashboard.units.mg')}
+                      {(result.iron ?? 0).toFixed(1)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminA')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminA?.toFixed(0)} {t('dashboard.units.mcg')}
+                      {(result.vitaminA ?? 0).toFixed(0)} {t('dashboard.units.mcg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminC')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminC?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.vitaminC ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminD')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminD?.toFixed(0)} {t('dashboard.units.mcg')}
+                      {(result.vitaminD ?? 0).toFixed(0)} {t('dashboard.units.mcg')}
                     </span>
                   </div>
                 </div>
