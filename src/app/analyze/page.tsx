@@ -41,8 +41,8 @@ export default function AnalyzePage() {
   const handleAnalyze = async () => {
     if (!file || !previewUrl) {
       toast({
-        title: 'No file selected',
-        description: 'Please choose an image to analyze.',
+        title: 'لم يتم تحديد أي ملف',
+        description: 'الرجاء اختيار صورة لتحليلها.',
         variant: 'destructive',
       });
       return;
@@ -57,14 +57,14 @@ export default function AnalyzePage() {
       });
       setResult(analysisResult);
       toast({
-        title: 'Analysis Complete!',
-        description: 'Estimated nutritional information is now available.',
+        title: 'اكتمل التحليل!',
+        description: 'المعلومات الغذائية التقديرية متاحة الآن.',
       });
     } catch (error) {
       console.error('Analysis failed:', error);
       toast({
-        title: 'Analysis Failed',
-        description: 'Could not analyze the image. Please try another one.',
+        title: 'فشل التحليل',
+        description: 'تعذر تحليل الصورة. يرجى تجربة صورة أخرى.',
         variant: 'destructive',
       });
     } finally {
@@ -76,7 +76,7 @@ export default function AnalyzePage() {
     if (!result) return;
 
     addMeal({
-      name: result.foodItems.join(', ') || 'Analyzed Meal',
+      name: result.foodItems.join(', ') || 'وجبة تم تحليلها',
       calories: result.estimatedCalories,
       protein: result.protein,
       carbs: result.carbs,
@@ -94,8 +94,8 @@ export default function AnalyzePage() {
     });
 
     toast({
-      title: 'Meal Logged!',
-      description: 'The analyzed meal has been added to your daily dashboard.',
+      title: 'تم تسجيل الوجبة!',
+      description: 'تمت إضافة الوجبة التي تم تحليلها إلى لوحة التحكم اليومية الخاصة بك.',
     });
     setResult(null);
     setFile(null);
@@ -106,19 +106,19 @@ export default function AnalyzePage() {
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
         <h1 className="font-headline text-4xl font-bold">
-          Analyze Meal with AI
+          تحليل الوجبة بالذكاء الاصطناعي
         </h1>
         <p className="text-muted-foreground">
-          Upload a photo of your meal and let our AI do the heavy lifting.
+          حمّل صورة لوجبتك ودع الذكاء الاصطناعي يقوم بالعمل الشاق.
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">1. Upload Image</CardTitle>
+            <CardTitle className="font-headline">1. تحميل الصورة</CardTitle>
             <CardDescription>
-              Choose a clear picture of your meal.
+              اختر صورة واضحة لوجبتك.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -141,7 +141,7 @@ export default function AnalyzePage() {
               ) : (
                 <div className="flex flex-col items-center text-muted-foreground">
                   <UploadCloud className="mb-2 h-10 w-10" />
-                  <p>Click or drag to upload</p>
+                  <p>انقر أو اسحب للتحميل</p>
                 </div>
               )}
             </div>
@@ -153,67 +153,67 @@ export default function AnalyzePage() {
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              {isLoading ? 'Analyzing...' : 'Analyze Meal'}
+              {isLoading ? 'يتم التحليل...' : 'تحليل الوجبة'}
             </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">2. Review Analysis</CardTitle>
+            <CardTitle className="font-headline">2. مراجعة التحليل</CardTitle>
             <CardDescription>
-              Here is the estimated nutritional information.
+              إليك المعلومات الغذائية التقديرية.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && (
               <div className="flex flex-col items-center justify-center space-y-2 pt-10 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p>Analyzing image...</p>
+                <p>جاري تحليل الصورة...</p>
               </div>
             )}
             {result ? (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold">Identified Food Items</h3>
+                  <h3 className="font-semibold">العناصر الغذائية المحددة</h3>
                   <p className="text-sm text-muted-foreground">
                     {result.foodItems.join(', ')}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Estimated Calories</h3>
+                  <h3 className="font-semibold">السعرات الحرارية التقديرية</h3>
                   <p className="text-sm text-primary font-bold">
-                    ~{result.estimatedCalories} kcal
+                    ~{result.estimatedCalories} سعرة حرارية
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">Estimated Nutrients</h3>
+                  <h3 className="font-semibold">العناصر الغذائية التقديرية</h3>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                    <span className="text-muted-foreground">Protein:</span>
-                    <span className="text-right font-medium">{result.protein?.toFixed(1)} g</span>
-                    <span className="text-muted-foreground">Carbs:</span>
-                    <span className="text-right font-medium">{result.carbs?.toFixed(1)} g</span>
-                    <span className="text-muted-foreground">Fat:</span>
-                    <span className="text-right font-medium">{result.fat?.toFixed(1)} g</span>
-                    <span className="text-muted-foreground">Fiber:</span>
-                    <span className="text-right font-medium">{result.fiber?.toFixed(1)} g</span>
-                     <span className="text-muted-foreground">Sugar:</span>
-                    <span className="text-right font-medium">{result.sugar?.toFixed(1)} g</span>
-                    <span className="text-muted-foreground">Sodium:</span>
-                    <span className="text-right font-medium">{result.sodium?.toFixed(0)} mg</span>
-                    <span className="text-muted-foreground">Potassium:</span>
-                    <span className="text-right font-medium">{result.potassium?.toFixed(0)} mg</span>
-                    <span className="text-muted-foreground">Calcium:</span>
-                    <span className="text-right font-medium">{result.calcium?.toFixed(0)} mg</span>
-                    <span className="text-muted-foreground">Iron:</span>
-                    <span className="text-right font-medium">{result.iron?.toFixed(1)} mg</span>
-                    <span className="text-muted-foreground">Vitamin A:</span>
-                    <span className="text-right font-medium">{result.vitaminA?.toFixed(0)} mcg</span>
-                    <span className="text-muted-foreground">Vitamin C:</span>
-                    <span className="text-right font-medium">{result.vitaminC?.toFixed(0)} mg</span>
-                    <span className="text-muted-foreground">Vitamin D:</span>
-                    <span className="text-right font-medium">{result.vitaminD?.toFixed(0)} mcg</span>
+                    <span className="text-muted-foreground">بروتين:</span>
+                    <span className="text-left font-medium">{result.protein?.toFixed(1)} غ</span>
+                    <span className="text-muted-foreground">كربوهيدرات:</span>
+                    <span className="text-left font-medium">{result.carbs?.toFixed(1)} غ</span>
+                    <span className="text-muted-foreground">دهون:</span>
+                    <span className="text-left font-medium">{result.fat?.toFixed(1)} غ</span>
+                    <span className="text-muted-foreground">ألياف:</span>
+                    <span className="text-left font-medium">{result.fiber?.toFixed(1)} غ</span>
+                     <span className="text-muted-foreground">سكر:</span>
+                    <span className="text-left font-medium">{result.sugar?.toFixed(1)} غ</span>
+                    <span className="text-muted-foreground">صوديوم:</span>
+                    <span className="text-left font-medium">{result.sodium?.toFixed(0)} ملغ</span>
+                    <span className="text-muted-foreground">بوتاسيوم:</span>
+                    <span className="text-left font-medium">{result.potassium?.toFixed(0)} ملغ</span>
+                    <span className="text-muted-foreground">كالسيوم:</span>
+                    <span className="text-left font-medium">{result.calcium?.toFixed(0)} ملغ</span>
+                    <span className="text-muted-foreground">حديد:</span>
+                    <span className="text-left font-medium">{result.iron?.toFixed(1)} ملغ</span>
+                    <span className="text-muted-foreground">فيتامين أ:</span>
+                    <span className="text-left font-medium">{result.vitaminA?.toFixed(0)} مكغ</span>
+                    <span className="text-muted-foreground">فيتامين ج:</span>
+                    <span className="text-left font-medium">{result.vitaminC?.toFixed(0)} ملغ</span>
+                    <span className="text-muted-foreground">فيتامين د:</span>
+                    <span className="text-left font-medium">{result.vitaminD?.toFixed(0)} مكغ</span>
                   </div>
                 </div>
 
@@ -221,13 +221,13 @@ export default function AnalyzePage() {
                   onClick={handleAddMeal}
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 >
-                  Add to Daily Log
+                  إضافة إلى السجل اليومي
                 </Button>
               </div>
             ) : (
               !isLoading && (
                 <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                  <p>Analysis results will appear here.</p>
+                  <p>ستظهر نتائج التحليل هنا.</p>
                 </div>
               )
             )}

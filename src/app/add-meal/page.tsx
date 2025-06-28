@@ -27,12 +27,12 @@ import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(2, {
-    message: 'Meal name must be at least 2 characters.',
+    message: 'يجب أن يتكون اسم الوجبة من حرفين على الأقل.',
   }),
-  calories: z.coerce.number().min(0, { message: 'Calories must be positive.' }),
-  protein: z.coerce.number().min(0, { message: 'Protein must be positive.' }),
-  carbs: z.coerce.number().min(0, { message: 'Carbs must be positive.' }),
-  fat: z.coerce.number().min(0, { message: 'Fat must be positive.' }),
+  calories: z.coerce.number().min(0, { message: 'يجب أن تكون السعرات الحرارية موجبة.' }),
+  protein: z.coerce.number().min(0, { message: 'يجب أن يكون البروتين موجبًا.' }),
+  carbs: z.coerce.number().min(0, { message: 'يجب أن تكون الكربوهيدرات موجبة.' }),
+  fat: z.coerce.number().min(0, { message: 'يجب أن تكون الدهون موجبة.' }),
   fiber: z.coerce.number().min(0).optional(),
   sugar: z.coerce.number().min(0).optional(),
   sodium: z.coerce.number().min(0).optional(),
@@ -72,8 +72,8 @@ export default function AddMealPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     addMeal(values);
     toast({
-      title: 'Meal Added!',
-      description: `${values.name} has been added to your daily log.`,
+      title: 'تمت إضافة الوجبة!',
+      description: `تمت إضافة ${values.name} إلى سجلك اليومي.`,
     });
     router.push('/');
   }
@@ -81,17 +81,17 @@ export default function AddMealPage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">Add Meal Manually</h1>
+        <h1 className="font-headline text-4xl font-bold">إضافة وجبة يدوياً</h1>
         <p className="text-muted-foreground">
-          Log a meal by entering its nutritional information below.
+          سجل وجبة عن طريق إدخال معلوماتها الغذائية أدناه.
         </p>
       </header>
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline">Meal Details</CardTitle>
+          <CardTitle className="font-headline">تفاصيل الوجبة</CardTitle>
           <CardDescription>
-            Enter the details for your meal, snack, or recipe.
+            أدخل تفاصيل وجبتك أو وجبتك الخفيفة أو وصفتك.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -102,10 +102,10 @@ export default function AddMealPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Meal Name</FormLabel>
+                    <FormLabel>اسم الوجبة</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g., Grilled Chicken Salad"
+                        placeholder="مثال: سلطة دجاج مشوي"
                         {...field}
                       />
                     </FormControl>
@@ -116,7 +116,7 @@ export default function AddMealPage() {
 
               <div className="space-y-4 rounded-lg border p-4">
                 <h3 className="text-lg font-medium leading-none">
-                  Macronutrients
+                  المغذيات الكبرى
                 </h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   <FormField
@@ -124,7 +124,7 @@ export default function AddMealPage() {
                     name="calories"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Calories (kcal)</FormLabel>
+                        <FormLabel>السعرات الحرارية (kcal)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="250" {...field} />
                         </FormControl>
@@ -137,7 +137,7 @@ export default function AddMealPage() {
                     name="protein"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Protein (g)</FormLabel>
+                        <FormLabel>بروتين (غ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="30" {...field} />
                         </FormControl>
@@ -150,7 +150,7 @@ export default function AddMealPage() {
                     name="carbs"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Carbohydrates (g)</FormLabel>
+                        <FormLabel>كربوهيدرات (غ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="10" {...field} />
                         </FormControl>
@@ -163,7 +163,7 @@ export default function AddMealPage() {
                     name="fat"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fat (g)</FormLabel>
+                        <FormLabel>دهون (غ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="15" {...field} />
                         </FormControl>
@@ -176,7 +176,7 @@ export default function AddMealPage() {
                     name="fiber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Fiber (g)</FormLabel>
+                        <FormLabel>ألياف (غ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="5" {...field} />
                         </FormControl>
@@ -189,7 +189,7 @@ export default function AddMealPage() {
                     name="sugar"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sugar (g)</FormLabel>
+                        <FormLabel>سكر (غ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="3" {...field} />
                         </FormControl>
@@ -202,7 +202,7 @@ export default function AddMealPage() {
 
               <div className="space-y-4 rounded-lg border p-4">
                 <h3 className="text-lg font-medium leading-none">
-                  Micronutrients
+                  المغذيات الدقيقة
                 </h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   <FormField
@@ -210,7 +210,7 @@ export default function AddMealPage() {
                     name="sodium"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sodium (mg)</FormLabel>
+                        <FormLabel>صوديوم (ملغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="500" {...field} />
                         </FormControl>
@@ -223,7 +223,7 @@ export default function AddMealPage() {
                     name="potassium"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Potassium (mg)</FormLabel>
+                        <FormLabel>بوتاسيوم (ملغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="300" {...field} />
                         </FormControl>
@@ -236,7 +236,7 @@ export default function AddMealPage() {
                     name="calcium"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Calcium (mg)</FormLabel>
+                        <FormLabel>كالسيوم (ملغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="100" {...field} />
                         </FormControl>
@@ -249,7 +249,7 @@ export default function AddMealPage() {
                     name="iron"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Iron (mg)</FormLabel>
+                        <FormLabel>حديد (ملغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="2" {...field} />
                         </FormControl>
@@ -262,7 +262,7 @@ export default function AddMealPage() {
                     name="vitaminA"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vitamin A (mcg)</FormLabel>
+                        <FormLabel>فيتامين أ (مكغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="150" {...field} />
                         </FormControl>
@@ -275,7 +275,7 @@ export default function AddMealPage() {
                     name="vitaminC"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vitamin C (mg)</FormLabel>
+                        <FormLabel>فيتامين ج (ملغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="50" {...field} />
                         </FormControl>
@@ -288,7 +288,7 @@ export default function AddMealPage() {
                     name="vitaminD"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vitamin D (mcg)</FormLabel>
+                        <FormLabel>فيتامين د (مكغ)</FormLabel>
                         <FormControl>
                           <Input type="number" placeholder="5" {...field} />
                         </FormControl>
@@ -303,7 +303,7 @@ export default function AddMealPage() {
                 type="submit"
                 className="bg-accent text-accent-foreground hover:bg-accent/90"
               >
-                Add Meal to Log
+                إضافة وجبة إلى السجل
               </Button>
             </form>
           </Form>

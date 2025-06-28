@@ -38,22 +38,22 @@ const navItems = [
   {
     href: '/',
     icon: LayoutDashboard,
-    label: 'Dashboard',
+    label: 'لوحة التحكم',
   },
   {
     href: '/analyze',
     icon: Camera,
-    label: 'Analyze Meal',
+    label: 'تحليل وجبة',
   },
   {
     href: '/add-meal',
     icon: PlusCircle,
-    label: 'Add Meal',
+    label: 'إضافة وجبة',
   },
   {
     href: '/suggestions',
     icon: BrainCircuit,
-    label: 'AI Suggestions',
+    label: 'اقتراحات الذكاء الاصطناعي',
   },
 ];
 
@@ -119,13 +119,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuContent side="left" align="start">
+              <DropdownMenuLabel>حسابي</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
+              <DropdownMenuItem>الإعدادات</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem>تسجيل الخروج</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarHeader>
@@ -140,7 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex items-center gap-2">
              <NutriSnapLogo className="h-6 w-6 text-primary" />
              <div className="flex flex-col">
-                <span className="font-headline text-lg font-semibold leading-tight">NutriSnap</span>
+                <span className="font-headline text-lg font-semibold leading-tight">نوتري سناب</span>
                 <span className="text-xs text-muted-foreground">لقطة غذائية</span>
               </div>
           </Link>

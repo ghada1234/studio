@@ -32,11 +32,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   dietaryPreferences: z.string().min(2, {
-    message: 'Please enter your dietary preferences.',
+    message: 'الرجاء إدخال تفضيلاتك الغذائية.',
   }),
   nutrientNeeds: z
     .string()
-    .min(2, { message: 'Please enter your nutrient needs.' }),
+    .min(2, { message: 'الرجاء إدخال احتياجاتك الغذائية.' }),
   dislikedIngredients: z.string().optional(),
   numberOfMeals: z.coerce.number().min(1).max(10),
   useRemainingCalories: z.boolean().default(false),
@@ -54,8 +54,8 @@ export default function SuggestionsPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dietaryPreferences: 'Anything',
-      nutrientNeeds: 'High protein',
+      dietaryPreferences: 'أي شيء',
+      nutrientNeeds: 'بروتين عالي',
       dislikedIngredients: '',
       numberOfMeals: 3,
       useRemainingCalories: false,
@@ -76,9 +76,9 @@ export default function SuggestionsPage() {
     } catch (error) {
       console.error('Suggestion failed:', error);
       toast({
-        title: 'Suggestion Failed',
+        title: 'فشل الاقتراح',
         description:
-          'Could not get meal suggestions. Please try again later.',
+          'تعذر الحصول على اقتراحات الوجبات. يرجى المحاولة مرة أخرى لاحقًا.',
         variant: 'destructive',
       });
     } finally {
@@ -89,17 +89,17 @@ export default function SuggestionsPage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">AI Meal Suggestions</h1>
+        <h1 className="font-headline text-4xl font-bold">اقتراحات وجبات الذكاء الاصطناعي</h1>
         <p className="text-muted-foreground">
-          Stuck on what to eat? Get personalized meal ideas from our AI chef.
+          محتار ماذا تأكل؟ احصل على أفكار وجبات مخصصة من طاهينا الذكي.
         </p>
       </header>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">Your Preferences</CardTitle>
+            <CardTitle className="font-headline">تفضيلاتك</CardTitle>
             <CardDescription>
-              Tell us what you&apos;re looking for in a meal.
+              أخبرنا بما تبحث عنه في الوجبة.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -113,10 +113,10 @@ export default function SuggestionsPage() {
                   name="dietaryPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Dietary Preferences</FormLabel>
+                      <FormLabel>التفضيلات الغذائية</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., Vegetarian, Low-FODMAP"
+                          placeholder="مثال: نباتي، قليل الفودماب"
                           {...field}
                         />
                       </FormControl>
@@ -129,10 +129,10 @@ export default function SuggestionsPage() {
                   name="nutrientNeeds"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nutrient Needs</FormLabel>
+                      <FormLabel>الاحتياجات الغذائية</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., High fiber, Low carb"
+                          placeholder="مثال: عالي الألياف، قليل الكربوهيدرات"
                           {...field}
                         />
                       </FormControl>
@@ -145,15 +145,15 @@ export default function SuggestionsPage() {
                   name="dislikedIngredients"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Disliked Ingredients (optional)</FormLabel>
+                      <FormLabel>مكونات غير محببة (اختياري)</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., Cilantro, Mushrooms"
+                          placeholder="مثال: كزبرة، فطر"
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        Comma-separated list of ingredients to avoid.
+                        قائمة بالمكونات التي يجب تجنبها مفصولة بفواصل.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -164,7 +164,7 @@ export default function SuggestionsPage() {
                   name="numberOfMeals"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Number of Suggestions</FormLabel>
+                      <FormLabel>عدد الاقتراحات</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
@@ -187,12 +187,12 @@ export default function SuggestionsPage() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel htmlFor="use-remaining">
-                          Base on remaining calories
+                          بناءً على السعرات الحرارية المتبقية
                         </FormLabel>
                         <FormDescription>
-                          Suggest meals that fit within your remaining{' '}
+                          اقترح وجبات تناسب السعرات الحرارية المتبقية{' '}
                           <span className="font-bold text-primary">
-                            {remainingCalories.toFixed(0)} kcal
+                            {remainingCalories.toFixed(0)} سعرة حرارية
                           </span>
                           .
                         </FormDescription>
@@ -207,7 +207,7 @@ export default function SuggestionsPage() {
                   ) : (
                     <Sparkles className="mr-2 h-4 w-4" />
                   )}
-                  {isLoading ? 'Generating...' : 'Get Suggestions'}
+                  {isLoading ? 'جاري الإنشاء...' : 'الحصول على اقتراحات'}
                 </Button>
               </form>
             </Form>
@@ -216,16 +216,16 @@ export default function SuggestionsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">Meal Ideas</CardTitle>
+            <CardTitle className="font-headline">أفكار وجبات</CardTitle>
             <CardDescription>
-              Here are some suggestions from our AI.
+              إليك بعض الاقتراحات من ذكائنا الاصطناعي.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && (
               <div className="flex flex-col items-center justify-center space-y-2 pt-10 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p>Cooking up some ideas...</p>
+                <p>جاري تحضير بعض الأفكار...</p>
               </div>
             )}
             {result ? (
@@ -243,7 +243,7 @@ export default function SuggestionsPage() {
             ) : (
               !isLoading && (
                 <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                  <p>Your meal suggestions will appear here.</p>
+                  <p>ستظهر اقتراحات وجباتك هنا.</p>
                 </div>
               )
             )}

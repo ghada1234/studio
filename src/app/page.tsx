@@ -29,19 +29,19 @@ import { ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 const chartConfig = {
   calories: {
-    label: 'Calories',
+    label: 'السعرات الحرارية',
     color: 'hsl(var(--chart-1))',
   },
   protein: {
-    label: 'Protein',
+    label: 'بروتين',
     color: 'hsl(var(--chart-2))',
   },
   carbs: {
-    label: 'Carbs',
+    label: 'كربوهيدرات',
     color: 'hsl(var(--chart-3))',
   },
   fat: {
-    label: 'Fat',
+    label: 'دهون',
     color: 'hsl(var(--chart-4))',
   },
 } satisfies ChartConfig;
@@ -83,9 +83,9 @@ export default function DashboardPage() {
     calorieGoal > 0 ? (totalCalories / calorieGoal) * 100 : 0;
 
   const macroData = [
-    { name: 'Protein', value: totalProtein, fill: 'var(--color-protein)' },
-    { name: 'Carbs', value: totalCarbs, fill: 'var(--color-carbs)' },
-    { name: 'Fat', value: totalFat, fill: 'var(--color-fat)' },
+    { name: 'بروتين', value: totalProtein, fill: 'var(--color-protein)' },
+    { name: 'كربوهيدرات', value: totalCarbs, fill: 'var(--color-carbs)' },
+    { name: 'دهون', value: totalFat, fill: 'var(--color-fat)' },
   ];
 
   const handleSetGoal = () => {
@@ -98,18 +98,18 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">Daily Dashboard</h1>
+        <h1 className="font-headline text-4xl font-bold">لوحة التحكم اليومية</h1>
         <p className="text-muted-foreground">
-          Here&apos;s your nutritional summary for today.
+          إليك ملخصك الغذائي لهذا اليوم.
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-headline">Calorie Goal</CardTitle>
+            <CardTitle className="font-headline">هدف السعرات الحرارية</CardTitle>
             <CardDescription>
-              Set your daily calorie target and track your progress.
+              حدد هدفك اليومي من السعرات الحرارية وتتبع تقدمك.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -118,21 +118,21 @@ export default function DashboardPage() {
                 type="number"
                 value={goalInput}
                 onChange={(e) => setGoalInput(e.target.value)}
-                placeholder="e.g., 2000"
+                placeholder="مثال: 2000"
                 className="max-w-xs"
               />
-              <Button onClick={handleSetGoal}>Set Goal</Button>
+              <Button onClick={handleSetGoal}>تحديد الهدف</Button>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between font-medium">
-                <span>{Math.round(totalCalories)} kcal consumed</span>
+                <span>{`استهلكت ${Math.round(totalCalories)} سعرة حرارية`}</span>
                 <span className="text-muted-foreground">
-                  {calorieGoal} kcal goal
+                  {`الهدف ${calorieGoal} سعرة حرارية`}
                 </span>
               </div>
               <Progress
                 value={calorieProgress}
-                aria-label={`${calorieProgress.toFixed(0)}% of calorie goal`}
+                aria-label={`${calorieProgress.toFixed(0)}% من هدف السعرات الحرارية`}
               />
             </div>
           </CardContent>
@@ -140,15 +140,15 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">Macronutrients</CardTitle>
-            <CardDescription>Total grams consumed today.</CardDescription>
+            <CardTitle className="font-headline">المغذيات الكبرى</CardTitle>
+            <CardDescription>إجمالي الجرامات المستهلكة اليوم.</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-48 w-full">
               <BarChart
                 data={macroData}
                 layout="vertical"
-                margin={{ left: 10, right: 10 }}
+                margin={{ right: 10, left: 10 }}
               >
                 <CartesianGrid horizontal={false} />
                 <YAxis
@@ -157,7 +157,8 @@ export default function DashboardPage() {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={10}
-                  width={50}
+                  width={60}
+                  reversed
                 />
                 <XAxis type="number" hide />
                 <ChartTooltip
@@ -173,49 +174,49 @@ export default function DashboardPage() {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="font-headline">
-              Micronutrient Summary
+              ملخص المغذيات الدقيقة
             </CardTitle>
             <CardDescription>
-              Total micronutrients consumed today.
+              إجمالي المغذيات الدقيقة المستهلكة اليوم.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-x-8 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
               <div>
-                <p className="text-sm text-muted-foreground">Fiber</p>
-                <p className="font-medium">{totalFiber.toFixed(1)} g</p>
+                <p className="text-sm text-muted-foreground">ألياف</p>
+                <p className="font-medium">{totalFiber.toFixed(1)} غ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Sugar</p>
-                <p className="font-medium">{totalSugar.toFixed(1)} g</p>
+                <p className="text-sm text-muted-foreground">سكر</p>
+                <p className="font-medium">{totalSugar.toFixed(1)} غ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Sodium</p>
-                <p className="font-medium">{totalSodium.toFixed(0)} mg</p>
+                <p className="text-sm text-muted-foreground">صوديوم</p>
+                <p className="font-medium">{totalSodium.toFixed(0)} ملغ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Potassium</p>
-                <p className="font-medium">{totalPotassium.toFixed(0)} mg</p>
+                <p className="text-sm text-muted-foreground">بوتاسيوم</p>
+                <p className="font-medium">{totalPotassium.toFixed(0)} ملغ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Calcium</p>
-                <p className="font-medium">{totalCalcium.toFixed(0)} mg</p>
+                <p className="text-sm text-muted-foreground">كالسيوم</p>
+                <p className="font-medium">{totalCalcium.toFixed(0)} ملغ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Iron</p>
-                <p className="font-medium">{totalIron.toFixed(1)} mg</p>
+                <p className="text-sm text-muted-foreground">حديد</p>
+                <p className="font-medium">{totalIron.toFixed(1)} ملغ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Vitamin A</p>
-                <p className="font-medium">{totalVitaminA.toFixed(0)} mcg</p>
+                <p className="text-sm text-muted-foreground">فيتامين أ</p>
+                <p className="font-medium">{totalVitaminA.toFixed(0)} مكغ</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Vitamin C</p>
-                <p className="font-medium">{totalVitaminC.toFixed(0)} mg</p>
+                <p className="text-sm text-muted-foreground">فيتامين ج</p>
+                <p className="font-medium">{totalVitaminC.toFixed(0)} ملغ</p>
               </div>
                <div>
-                <p className="text-sm text-muted-foreground">Vitamin D</p>
-                <p className="font-medium">{totalVitaminD.toFixed(0)} mcg</p>
+                <p className="text-sm text-muted-foreground">فيتامين د</p>
+                <p className="font-medium">{totalVitaminD.toFixed(0)} مكغ</p>
               </div>
             </div>
           </CardContent>
@@ -223,9 +224,9 @@ export default function DashboardPage() {
 
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="font-headline">Logged Meals</CardTitle>
+            <CardTitle className="font-headline">الوجبات المسجلة</CardTitle>
             <CardDescription>
-              All your meals and snacks for today. Click to expand.
+              جميع وجباتك ووجباتك الخفيفة لهذا اليوم. انقر للتوسيع.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -238,29 +239,29 @@ export default function DashboardPage() {
                         <div className="flex-1">
                           <p className="font-semibold">{meal.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {meal.calories} kcal &bull; P: {meal.protein}g &bull;
-                            C: {meal.carbs}g &bull; F: {meal.fat}g
+                            {meal.calories} سعرة حرارية &bull; ب: {meal.protein}غ &bull;
+                            ك: {meal.carbs}غ &bull; د: {meal.fat}غ
                           </p>
                         </div>
                         <CollapsibleTrigger asChild>
                           <Button variant="ghost" size="sm" className="w-9 p-0">
                             <ChevronsUpDown className="h-4 w-4" />
-                            <span className="sr-only">Toggle</span>
+                            <span className="sr-only">تبديل</span>
                           </Button>
                         </CollapsibleTrigger>
                       </div>
                       <CollapsibleContent>
                         <div className="border-t px-4 py-2">
                            <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
-                              <span className="text-muted-foreground">Fiber:</span><span className="text-right">{meal.fiber?.toFixed(1) ?? 'N/A'} g</span>
-                              <span className="text-muted-foreground">Sugar:</span><span className="text-right">{meal.sugar?.toFixed(1) ?? 'N/A'} g</span>
-                              <span className="text-muted-foreground">Sodium:</span><span className="text-right">{meal.sodium?.toFixed(0) ?? 'N/A'} mg</span>
-                              <span className="text-muted-foreground">Potassium:</span><span className="text-right">{meal.potassium?.toFixed(0) ?? 'N/A'} mg</span>
-                              <span className="text-muted-foreground">Calcium:</span><span className="text-right">{meal.calcium?.toFixed(0) ?? 'N/A'} mg</span>
-                              <span className="text-muted-foreground">Iron:</span><span className="text-right">{meal.iron?.toFixed(1) ?? 'N/A'} mg</span>
-                              <span className="text-muted-foreground">Vitamin A:</span><span className="text-right">{meal.vitaminA?.toFixed(0) ?? 'N/A'} mcg</span>
-                              <span className="text-muted-foreground">Vitamin C:</span><span className="text-right">{meal.vitaminC?.toFixed(0) ?? 'N/A'} mg</span>
-                              <span className="text-muted-foreground">Vitamin D:</span><span className="text-right">{meal.vitaminD?.toFixed(0) ?? 'N/A'} mcg</span>
+                              <span className="text-muted-foreground">ألياف:</span><span className="text-left font-medium">{meal.fiber?.toFixed(1) ?? 'غير متاح'} غ</span>
+                              <span className="text-muted-foreground">سكر:</span><span className="text-left font-medium">{meal.sugar?.toFixed(1) ?? 'غير متاح'} غ</span>
+                              <span className="text-muted-foreground">صوديوم:</span><span className="text-left font-medium">{meal.sodium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
+                              <span className="text-muted-foreground">بوتاسيوم:</span><span className="text-left font-medium">{meal.potassium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
+                              <span className="text-muted-foreground">كالسيوم:</span><span className="text-left font-medium">{meal.calcium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
+                              <span className="text-muted-foreground">حديد:</span><span className="text-left font-medium">{meal.iron?.toFixed(1) ?? 'غير متاح'} ملغ</span>
+                              <span className="text-muted-foreground">فيتامين أ:</span><span className="text-left font-medium">{meal.vitaminA?.toFixed(0) ?? 'غير متاح'} مكغ</span>
+                              <span className="text-muted-foreground">فيتامين ج:</span><span className="text-left font-medium">{meal.vitaminC?.toFixed(0) ?? 'غير متاح'} ملغ</span>
+                              <span className="text-muted-foreground">فيتامين د:</span><span className="text-left font-medium">{meal.vitaminD?.toFixed(0) ?? 'غير متاح'} ملغ</span>
                            </div>
                         </div>
                       </CollapsibleContent>
@@ -270,8 +271,8 @@ export default function DashboardPage() {
               </ul>
             ) : (
               <div className="text-center text-muted-foreground">
-                <p>No meals logged yet.</p>
-                <p>Add a meal manually or analyze a photo to get started!</p>
+                <p>لم يتم تسجيل أي وجبات بعد.</p>
+                <p>أضف وجبة يدويًا أو حلل صورة للبدء!</p>
               </div>
             )}
           </CardContent>
