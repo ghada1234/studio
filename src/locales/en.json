@@ -105,7 +105,9 @@
       "button_loading": "Analyzing...",
       "button": "Capture & Analyze",
       "error_permission_title": "Camera Access Denied",
-      "error_permission_description": "Please enable camera permissions in your browser settings to use this feature."
+      "error_permission_description": "Please enable camera permissions in your browser settings to use this feature.",
+      "error_camera_not_ready_title": "Camera Not Ready",
+      "error_camera_not_ready_description": "Please wait a moment for the camera to initialize."
     },
     "reviewCard": {
       "title": "2. Review Analysis",

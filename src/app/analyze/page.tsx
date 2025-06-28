@@ -63,28 +63,20 @@ export default function AnalyzePage() {
   }, [user, authLoading, router, t]);
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
+    if (activeTab !== 'camera') {
+      return;
+    }
+
+    let stream: MediaStream;
     const getCameraPermission = async () => {
-      // Only run if the camera tab is active
-      if (activeTab !== 'camera') {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-        }
-        return;
-      }
-
-      // Reset permission state when tab is activated
       setHasCameraPermission(null);
-
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode },
         });
-        stream = newStream; // Assign to local variable
         setHasCameraPermission(true);
-
         if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
+          videoRef.current.srcObject = stream;
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
@@ -99,13 +91,14 @@ export default function AnalyzePage() {
 
     getCameraPermission();
 
-    // Cleanup function
     return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+      if (videoRef.current && videoRef.current.srcObject) {
+        const mediaStream = videoRef.current.srcObject as MediaStream;
+        mediaStream.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
       }
     };
-  }, [activeTab, t, toast, facingMode]);
+  }, [activeTab, facingMode, t, toast]);
 
   if (authLoading || !user) {
     return (
@@ -177,7 +170,17 @@ export default function AnalyzePage() {
 
   const handleCaptureAndAnalyze = async () => {
     if (!videoRef.current || !canvasRef.current) return;
+
     const video = videoRef.current;
+    if (video.readyState < video.HAVE_ENOUGH_DATA) {
+      toast({
+        title: t('analyze.cameraCard.error_camera_not_ready_title'),
+        description: t('analyze.cameraCard.error_camera_not_ready_description'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;

@@ -105,7 +105,9 @@
       "button_loading": "يتم التحليل...",
       "button": "التقاط وتحليل",
       "error_permission_title": "تم رفض الوصول إلى الكاميرا",
-      "error_permission_description": "الرجاء تمكين أذونات الكاميرا في إعدادات متصفحك لاستخدام هذه الميزة."
+      "error_permission_description": "الرجاء تمكين أذونات الكاميرا في إعدادات متصفحك لاستخدام هذه الميزة.",
+      "error_camera_not_ready_title": "الكاميرا ليست جاهزة",
+      "error_camera_not_ready_description": "الرجاء الانتظار لحظة حتى يتم تهيئة الكاميرا."
     },
     "reviewCard": {
       "title": "2. مراجعة التحليل",
