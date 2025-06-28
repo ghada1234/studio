@@ -13,7 +13,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import type { User } from 'firebase/auth';
+import type { User, UserCredential } from 'firebase/auth';
 import { auth as firebaseAuth } from '@/lib/firebase';
 import { Loader2, Terminal } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -21,22 +21,87 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: typeof signInWithEmailAndPassword;
-  signup: typeof createUserWithEmailAndPassword;
-  logout: typeof signOut;
+  login: (email: string, password: string) => Promise<UserCredential>;
+  signup: (email: string, password: string) => Promise<UserCredential>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// A mock provider for when Firebase is not configured.
+// This allows the app to be used for prototyping without real credentials.
+const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [mockUser, setMockUser] = useState<User | null>({
+    uid: 'mock-user-id-123',
+    email: 'user@example.com',
+    emailVerified: true,
+    displayName: 'Mock User',
+    isAnonymous: false,
+    photoURL: null,
+    providerData: [],
+    providerId: 'password',
+    tenantId: null,
+    delete: () => Promise.resolve(),
+    getIdToken: () => Promise.resolve('mock-id-token'),
+    getIdTokenResult: () => Promise.resolve({ token: 'mock-id-token' } as any),
+    reload: () => Promise.resolve(),
+    toJSON: () => ({}),
+  });
+
+  const mockAuthContext: AuthContextType = useMemo(
+    () => ({
+      user: mockUser,
+      loading: false,
+      login: async (email, password) => {
+        console.log(`[Auth Mock] Logging in ${email}`);
+        const user = { ...mockUser!, email };
+        setMockUser(user);
+        // Return a mock UserCredential
+        return { user } as UserCredential;
+      },
+      signup: async (email, password) => {
+        console.log(`[Auth Mock] Signing up ${email}`);
+        const user = { ...mockUser!, email };
+        setMockUser(user);
+        // Return a mock UserCredential
+        return { user } as UserCredential;
+      },
+      logout: async () => {
+        console.log('[Auth Mock] Logging out');
+        setMockUser(null);
+      },
+    }),
+    [mockUser]
+  );
+
+  return (
+    <AuthContext.Provider value={mockAuthContext}>
+      {children}
+      <div className="fixed bottom-4 right-4 z-[200]">
+        <Alert variant="destructive" className="max-w-md shadow-lg">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>Developer Mode</AlertTitle>
+          <AlertDescription>
+            <p>Firebase not configured. Using mocked authentication.</p>
+          </AlertDescription>
+        </Alert>
+      </div>
+    </AuthContext.Provider>
+  );
+};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // If firebase isn't configured, we don't need to do anything here.
+    // The component will render the MockAuthProvider.
     if (!firebaseAuth) {
       setLoading(false);
       return;
     }
+
     const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
       setUser(user);
       setLoading(false);
@@ -45,51 +110,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const value = useMemo(
+  const value: AuthContextType = useMemo(
     () => ({
       user,
       loading,
       login: (email, password) => {
-        if (!firebaseAuth)
-          return Promise.reject(new Error('Firebase not configured.'));
+        if (!firebaseAuth) throw new Error('Firebase not configured.');
         return signInWithEmailAndPassword(firebaseAuth, email, password);
       },
       signup: (email, password) => {
-        if (!firebaseAuth)
-          return Promise.reject(new Error('Firebase not configured.'));
+        if (!firebaseAuth) throw new Error('Firebase not configured.');
         return createUserWithEmailAndPassword(firebaseAuth, email, password);
       },
       logout: () => {
-        if (!firebaseAuth)
-          return Promise.reject(new Error('Firebase not configured.'));
+        if (!firebaseAuth) throw new Error('Firebase not configured.');
         return signOut(firebaseAuth);
       },
     }),
     [user, loading]
   );
-  
-  if (!firebaseAuth) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-        <Alert variant="destructive" className="max-w-2xl">
-          <Terminal className="h-4 w-4" />
-          <AlertTitle>Firebase Not Configured</AlertTitle>
-          <AlertDescription>
-            <p className="mb-2">
-              It looks like your Firebase credentials are not set up correctly in
-              your <strong>.env</strong> file. This app requires Firebase for
-              user authentication.
-            </p>
-            <p>
-              Please copy your project's web app configuration from the
-              Firebase console, paste it into the <strong>.env</strong> file,
-              and then restart the development server.
-            </p>
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
@@ -99,9 +138,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-  );
+  // If Firebase is not configured, render the MockAuthProvider.
+  // This provides a fake authenticated user, allowing the rest of the app to render.
+  if (!firebaseAuth) {
+    return <MockAuthProvider>{children}</MockAuthProvider>;
+  }
+
+  // Otherwise, render the real provider with real Firebase auth state.
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
