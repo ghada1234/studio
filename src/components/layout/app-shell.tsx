@@ -8,7 +8,6 @@ import {
   Camera,
   Globe,
   LayoutDashboard,
-  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -59,11 +58,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       href: '/suggestions',
       icon: BrainCircuit,
       label: t('nav.suggestions'),
-    },
-    {
-      href: '/register',
-      icon: UserPlus,
-      label: t('nav.register'),
     },
   ];
 
@@ -125,56 +119,61 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </Link>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 rounded-full"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage
-                    src="https://placehold.co/100x100.png"
-                    alt="User"
-                    data-ai-hint="person avatar"
-                  />
-                  <AvatarFallback>U</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                {t('appShell.userMenu.myAccount')}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                {t('appShell.userMenu.profile')}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                {t('appShell.userMenu.settings')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Globe />
-                  <span>{t('appShell.userMenu.language')}</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <DropdownMenuItem onClick={() => setLanguage('en')}>
-                      English
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                      العربية
-                    </DropdownMenuItem>
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                {t('appShell.userMenu.logout')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center gap-4">
+            <Button asChild variant="outline" size="sm">
+                <Link href="/register">{t('nav.register')}</Link>
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src="https://placehold.co/100x100.png"
+                      alt="User"
+                      data-ai-hint="person avatar"
+                    />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  {t('appShell.userMenu.myAccount')}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  {t('appShell.userMenu.profile')}
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  {t('appShell.userMenu.settings')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Globe />
+                    <span>{t('appShell.userMenu.language')}</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setLanguage('en')}>
+                        English
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                        العربية
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  {t('appShell.userMenu.logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </header>
         {children}
       </SidebarInset>
