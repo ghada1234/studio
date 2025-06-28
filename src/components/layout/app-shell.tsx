@@ -8,7 +8,6 @@ import {
   Camera,
   Globe,
   LayoutDashboard,
-  PlusCircle,
 } from 'lucide-react';
 
 import {
@@ -54,11 +53,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       href: '/analyze',
       icon: Camera,
       label: t('nav.analyze'),
-    },
-    {
-      href: '/add-meal',
-      icon: PlusCircle,
-      label: t('nav.add'),
     },
     {
       href: '/suggestions',

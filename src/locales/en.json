@@ -2,7 +2,6 @@
   "nav": {
     "dashboard": "Dashboard",
     "analyze": "Analyze Meal",
-    "add": "Add Meal",
     "suggestions": "AI Suggestions"
   },
   "appShell": {
@@ -40,7 +39,7 @@
       "title": "Logged Meals",
       "description": "All your meals and snacks for the day. Click to expand.",
       "empty": "No meals logged yet.",
-      "empty_cta": "Add a meal manually or analyze a photo to get started!",
+      "empty_cta": "Analyze a meal photo to get started!",
       "mealDetails": "{{calories}} kcal • P: {{protein}}g • C: {{carbs}}g • F: {{fat}}g",
       "toggle": "Toggle"
     },
@@ -97,30 +96,6 @@
       "log_success_toast_description": "The analyzed meal has been added to your daily dashboard."
     },
      "analyzedMealName": "Analyzed Meal"
-  },
-  "addMeal": {
-    "title": "Add Meal Manually",
-    "header": "Add Meal Manually",
-    "description": "Log a meal by entering its nutritional information below.",
-    "detailsCard": {
-      "title": "Meal Details",
-      "description": "Enter the details of your meal, snack, or recipe."
-    },
-    "form": {
-      "name": "Meal Name",
-      "name_placeholder": "e.g., Grilled Chicken Salad",
-      "macros_title": "Macronutrients",
-      "micros_title": "Micronutrients",
-      "button": "Add Meal to Log"
-    },
-    "validation": {
-      "name_min": "Meal name must be at least 2 characters.",
-      "positive_number": "Must be a positive number."
-    },
-    "toast": {
-      "title": "Meal Added!",
-      "description": "Successfully added {{name}} to your daily log."
-    }
   },
   "suggestions": {
     "title": "AI Meal Suggestions",
