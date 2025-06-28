@@ -38,32 +38,18 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are a nutrition analysis expert. Your task is to analyze the provided dish name and portion size and return a valid JSON object that strictly adheres to the provided JSON schema.
+  prompt: `You are an automated nutrition analysis service. Your ONLY function is to return a JSON object.
 
-**CRITICAL INSTRUCTIONS:**
-1.  You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting.
-2.  All nutritional values must be NUMBERS. Do not include units (e.g., "g" or "kcal").
-3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
-4.  If the input is not a recognizable food item, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
+Based on the user's input, perform a nutritional analysis.
 
-**EXAMPLE:**
-Input:
-- Name: "2 large eggs with toast"
-- Portion Size: "2 slices"
+**Rules:**
+- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
+- The JSON object must strictly match the provided schema.
+- If a nutritional value cannot be estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
+- If the input does not appear to be a food item, return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
+- All nutritional values MUST be numbers. Do not include units like "g" or "kcal".
 
-Expected Output:
-\`\`\`json
-{
-  "foodItems": ["eggs", "toast"],
-  "estimatedCalories": 300,
-  "protein": 18,
-  "carbs": 28,
-  "fat": 15,
-  "sugar": 2
-}
-\`\`\`
-
-**Dish to Analyze:**
+**Input to Analyze:**
 - Name: {{{dishName}}}
 {{#if portionSize}}
 - Portion Size: {{{portionSize}}}
@@ -99,8 +85,10 @@ const analyzeDishNameFlow = ai.defineFlow(
   },
   async (input) => {
     const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('The AI model failed to produce a valid analysis.');
+    if (!output || !output.foodItems) {
+      // If the output is invalid or doesn't contain the required foodItems key,
+      // return a minimal, valid object.
+      return { foodItems: [] };
     }
     return output;
   }

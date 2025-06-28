@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -45,11 +46,14 @@ const prompt = ai.definePrompt({
   name: 'suggestMealsPrompt',
   input: {schema: SuggestMealsInputSchema},
   output: {schema: SuggestMealsOutputSchema},
-  prompt: `You are a nutritional expert, skilled at suggesting meals based on a user's dietary restrictions and nutrient needs.
+  prompt: `You are an automated meal suggestion service. Your ONLY function is to return a JSON object.
 
-**CRITICAL INSTRUCTIONS:**
-1. You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting. The JSON object must conform to the provided JSON schema.
-2. If you cannot generate suggestions for any reason, return a JSON object with an empty "meals" array: \`{"meals": []}\`.
+Based on the user's requirements, generate a list of meal suggestions.
+
+**Rules:**
+- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
+- The JSON object must strictly match the provided schema.
+- If you cannot generate suggestions for any reason, return a JSON object with an empty "meals" array: \`{"meals": []}\`.
 
 **User's Requirements:**
 - Dietary Preferences: {{{dietaryPreferences}}}
@@ -59,15 +63,13 @@ const prompt = ai.definePrompt({
 {{/if}}
 {{#if remainingCalories}}
 - Remaining Calorie Budget: {{{remainingCalories}}} kcal for all suggested meals combined.
+- The total calories of all suggested meals MUST NOT exceed the remaining calorie budget.
+- Each meal suggestion MUST include an estimated calorie count. For example: "Grilled Salmon with Asparagus (~450 calories)".
 {{/if}}
 
 **Task:**
 - Suggest exactly {{{numberOfMeals}}} meals that satisfy these requirements.
-{{#if remainingCalories}}
-- The total calories of all suggested meals MUST NOT exceed the remaining calorie budget.
-- Each meal suggestion MUST include an estimated calorie count. For example: "Grilled Salmon with Asparagus (~450 calories)".
-{{/if}}
-  `,
+`,
 });
 
 const suggestMealsFlow = ai.defineFlow(
@@ -78,8 +80,9 @@ const suggestMealsFlow = ai.defineFlow(
   },
   async (input) => {
     const {output} = await prompt(input);
-    if (!output) {
-      // Return an empty list of meals if the model fails.
+    // If the output is invalid or doesn't contain the meals array,
+    // return an empty list of meals to prevent frontend errors.
+    if (!output || !Array.isArray(output.meals)) {
       return {meals: []};
     }
     return output;

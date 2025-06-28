@@ -41,33 +41,18 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are a nutrition analysis expert. Your task is to analyze the provided meal image and portion size and return a valid JSON object that strictly adheres to the provided JSON schema.
+  prompt: `You are an automated nutrition analysis service. Your ONLY function is to return a JSON object.
 
-**CRITICAL INSTRUCTIONS:**
-1.  You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting.
-2.  All nutritional values must be NUMBERS. Do not include units (e.g., "g" or "kcal").
-3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
-4.  If the image does not appear to contain food, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
+Based on the user's input image, perform a nutritional analysis.
 
-**EXAMPLE (for an image of a bowl of oatmeal with berries):**
-Input:
-- Image: [Image data]
-- Portion Size: "1 bowl"
+**Rules:**
+- Your entire response MUST be a single, valid JSON object. Do not include markdown formatting like \`\`\`json.
+- The JSON object must strictly match the provided schema.
+- If a nutritional value cannot be estimated, COMPLETELY OMIT its key. Do not use \`null\` or \`0\`.
+- If the image does not appear to contain food, return a JSON object with an empty "foodItems" array: \`{"foodItems": []}\`.
+- All nutritional values MUST be numbers. Do not include units like "g" or "kcal".
 
-Expected Output:
-\`\`\`json
-{
-  "foodItems": ["oatmeal", "blueberries", "strawberries"],
-  "estimatedCalories": 250,
-  "protein": 6,
-  "carbs": 50,
-  "fat": 4,
-  "fiber": 8,
-  "sugar": 15
-}
-\`\`\`
-
-**Image to Analyze:**
+**Input to Analyze:**
 {{media url=photoDataUri}}
 {{#if portionSize}}
 - Portion Size: {{{portionSize}}}
@@ -103,8 +88,10 @@ const analyzeFoodImageFlow = ai.defineFlow(
   },
   async (input) => {
     const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('The AI model failed to produce a valid analysis.');
+    if (!output || !output.foodItems) {
+      // If the output is invalid or doesn't contain the required foodItems key,
+      // return a minimal, valid object.
+      return { foodItems: [] };
     }
     return output;
   }
