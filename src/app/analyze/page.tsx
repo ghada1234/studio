@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLog } from '@/hooks/use-daily-log';
-import { Loader2, Search, Camera } from 'lucide-react';
+import { Loader2, Search, Camera, CameraReverse } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
@@ -46,6 +46,9 @@ export default function AnalyzePage() {
   const [hasCameraPermission, setHasCameraPermission] = useState<
     boolean | null
   >(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>(
+    'environment'
+  );
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -75,7 +78,7 @@ export default function AnalyzePage() {
 
       try {
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode },
         });
         stream = newStream; // Assign to local variable
         setHasCameraPermission(true);
@@ -102,7 +105,7 @@ export default function AnalyzePage() {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [activeTab, t, toast]);
+  }, [activeTab, t, toast, facingMode]);
 
   if (authLoading || !user) {
     return (
@@ -332,18 +335,33 @@ export default function AnalyzePage() {
                     )}
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
-                  <Button
-                    onClick={handleCaptureAndAnalyze}
-                    disabled={hasCameraPermission !== true || isLoading}
-                    className="w-full"
-                  >
-                    {loadingSource === 'image' ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : null}
-                    {loadingSource === 'image'
-                      ? t('analyze.cameraCard.button_loading')
-                      : t('analyze.cameraCard.button')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleCaptureAndAnalyze}
+                      disabled={hasCameraPermission !== true || isLoading}
+                      className="w-full"
+                    >
+                      {loadingSource === 'image' ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      {loadingSource === 'image'
+                        ? t('analyze.cameraCard.button_loading')
+                        : t('analyze.cameraCard.button')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setFacingMode((prev) =>
+                          prev === 'user' ? 'environment' : 'user'
+                        )
+                      }
+                      disabled={hasCameraPermission !== true || isLoading}
+                      aria-label="Reverse camera"
+                    >
+                      <CameraReverse />
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
