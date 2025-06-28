@@ -117,6 +117,7 @@
       "loading": "جاري تحليل...",
       "placeholder": "ستظهر نتائج التحليل هنا.",
       "identifiedItems": "العناصر الغذائية المحددة",
+      "no_items_found": "لم يتم التعرف على أي مواد غذائية.",
       "estimatedCalories": "السعرات الحرارية التقديرية",
       "estimatedNutrients": "العناصر الغذائية التقديرية",
       "add_to_log_button": "إضافة إلى السجل اليومي",

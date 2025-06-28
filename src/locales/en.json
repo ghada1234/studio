@@ -117,6 +117,7 @@
       "loading": "Analyzing...",
       "placeholder": "Analysis results will appear here.",
       "identifiedItems": "Identified Food Items",
+      "no_items_found": "No food items identified.",
       "estimatedCalories": "Estimated Calories",
       "estimatedNutrients": "Estimated Nutrients",
       "add_to_log_button": "Add to Daily Log",

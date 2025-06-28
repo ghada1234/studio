@@ -205,7 +205,7 @@ export default function AnalyzePage() {
 
     addMeal({
       name:
-        result.foodItems.join(', ') ||
+        result.foodItems?.join(', ') ||
         dishName ||
         t('analyze.analyzedMealName'),
       calories: result.estimatedCalories ?? 0,
@@ -425,7 +425,7 @@ export default function AnalyzePage() {
                     {t('analyze.reviewCard.identifiedItems')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {result.foodItems.join(', ')}
+                    {result.foodItems?.join(', ') || t('analyze.reviewCard.no_items_found')}
                   </p>
                 </div>
                 <div>

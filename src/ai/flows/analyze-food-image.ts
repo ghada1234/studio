@@ -48,12 +48,13 @@ Image: {{media url=photoDataUri}}
 Portion: {{{portionSize}}}
 {{/if}}
 
-Your task is to return ONLY a valid JSON object with the nutritional analysis.
-- Identify the food items in the image.
-- Estimate the nutritional values. Use the provided portion size if available, otherwise estimate from the image.
-- All nutritional values must be numbers, not strings. Do not include units in the JSON values.
-- If the image does not contain food, return a JSON object with an empty "foodItems" array and all other values as 0.
-- Do not add any text before or after the JSON object.
+Your task is to identify the food items and estimate their nutritional content from the image.
+- Return ONLY a valid JSON object adhering to the specified schema.
+- Identify the individual food items in the image.
+- Provide estimates for all available nutritional values. Use the provided portion size if available, otherwise estimate from the image.
+- All nutritional values MUST be numbers. Do not include units (e.g., "g" or "kcal").
+- If a specific nutritional value cannot be estimated, OMIT the key from the JSON object. Do not use placeholder values like 0, null, or "N/A".
+- If the image does not contain food, return a JSON object with an empty "foodItems" array and omit all other fields.
 
 Example of a valid response for an image of a salad:
 {
@@ -100,4 +101,3 @@ const analyzeFoodImageFlow = ai.defineFlow(
     return output;
   }
 );
-

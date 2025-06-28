@@ -45,12 +45,13 @@ Dish: {{{dishName}}}
 Portion: {{{portionSize}}}
 {{/if}}
 
-Your task is to return ONLY a valid JSON object with the nutritional analysis.
-- Identify the food items.
-- Estimate the nutritional values. Use the provided portion size if available, otherwise assume a standard serving.
-- All nutritional values must be numbers, not strings. Do not include units in the JSON values.
-- If the input is not a recognizable food, return a JSON object with an empty "foodItems" array and all other values as 0.
-- Do not add any text before or after the JSON object.
+Your task is to identify the food items and estimate their nutritional content.
+- Return ONLY a valid JSON object adhering to the specified schema.
+- Identify the individual food items.
+- Provide estimates for all available nutritional values.
+- All nutritional values MUST be numbers. Do not include units (e.g., "g" or "kcal").
+- If a specific nutritional value cannot be estimated, OMIT the key from the JSON object. Do not use placeholder values like 0, null, or "N/A".
+- If the input is not a recognizable food, return a JSON object with an empty "foodItems" array and omit all other fields.
 
 Example of a valid response for "A slice of cheese pizza":
 {
@@ -59,6 +60,13 @@ Example of a valid response for "A slice of cheese pizza":
   "protein": 12,
   "carbs": 36,
   "fat": 10
+}
+
+Example for an input where only calories and protein can be estimated:
+{
+  "foodItems": ["mystery meat"],
+  "estimatedCalories": 200,
+  "protein": 30
 }
 `,
   config: {
@@ -97,4 +105,3 @@ const analyzeDishNameFlow = ai.defineFlow(
     return output;
   }
 );
-
