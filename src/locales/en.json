@@ -95,6 +95,7 @@
     "searchCard": {
       "description": "Enter a dish name for a nutritional estimate.",
       "placeholder": "e.g., Spaghetti Bolognese",
+      "portion_placeholder": "Portion size (e.g., 1 cup, 100g)",
       "button_loading": "Searching...",
       "button": "Search Dish",
       "error_no_dish_title": "No Dish Name Entered",
@@ -102,10 +103,13 @@
     },
     "cameraCard": {
       "description": "Point your camera at the meal and snap a picture.",
+      "portion_placeholder": "Portion size (optional)",
       "button_loading": "Analyzing...",
       "button": "Capture & Analyze",
       "error_permission_title": "Camera Access Denied",
-      "error_permission_description": "Please enable camera permissions in your browser settings to use this feature."
+      "error_permission_description": "Please enable camera permissions in your browser settings to use this feature.",
+      "error_camera_not_ready_title": "Camera Not Ready",
+      "error_camera_not_ready_description": "Please wait a moment for the camera to initialize."
     },
     "reviewCard": {
       "title": "2. Review Analysis",
@@ -113,6 +117,7 @@
       "loading": "Analyzing...",
       "placeholder": "Analysis results will appear here.",
       "identifiedItems": "Identified Food Items",
+      "no_items_found": "No food items identified.",
       "estimatedCalories": "Estimated Calories",
       "estimatedNutrients": "Estimated Nutrients",
       "add_to_log_button": "Add to Daily Log",

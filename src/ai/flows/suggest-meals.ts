@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -45,24 +46,39 @@ const prompt = ai.definePrompt({
   name: 'suggestMealsPrompt',
   input: {schema: SuggestMealsInputSchema},
   output: {schema: SuggestMealsOutputSchema},
-  prompt: `You are a nutritional expert, skilled at suggesting meals
-  based on a user's dietary restrictions and nutrient needs.
+  prompt: `You are an expert meal planning AI. Your task is to suggest meals based on the user's requirements and return them in a specific JSON format.
 
-  Given the following dietary preferences: {{{dietaryPreferences}}}
-  And the following nutrient needs: {{{nutrientNeeds}}}
-  And disliked ingredients: {{{dislikedIngredients}}}
-  {{#if remainingCalories}}
-  And a remaining calorie budget of {{{remainingCalories}}} kcal for all suggested meals combined.
-  {{/if}}
+**IMPORTANT RULES:**
+1.  Your entire response MUST be a single, valid JSON object.
+2.  Do NOT include any text, explanation, or markdown formatting (like \`\`\`json) before or after the JSON object.
+3.  Your response MUST start with \`{\` and end with \`}\`.
+4.  If you cannot generate suggestions for any reason, you MUST return a JSON object with an empty "meals" array: \`{"meals": []}\`.
+5.  If calorie estimates are requested, they MUST be included in the meal string like this: "Meal Name (~XXX calories)".
 
-  Suggest {{{numberOfMeals}}} meals that satisfy these requirements.
-  {{#if remainingCalories}}
-  Make sure the total calories of all suggested meals do not exceed {{{remainingCalories}}} kcal.
-  Also include the estimated calories for each meal suggestion. For example: "Grilled Salmon with Asparagus (~450 calories)".
-  {{/if}}
+**EXAMPLE:**
+- **Input:** \`{ "dietaryPreferences": "vegetarian", "nutrientNeeds": "high protein", "numberOfMeals": 2, "remainingCalories": 800 }\`
+- **Output:**
+{
+  "meals": [
+    "Lentil Soup with Whole Wheat Bread (~400 calories)",
+    "Tofu Stir-fry with Brown Rice and Mixed Vegetables (~400 calories)"
+  ]
+}
 
-  Return the list of meals as a JSON array of strings.
-  `,
+**USER'S REQUIREMENTS:**
+- Dietary Preferences: {{{dietaryPreferences}}}
+- Nutrient Needs: {{{nutrientNeeds}}}
+{{#if dislikedIngredients}}
+- Disliked Ingredients: {{{dislikedIngredients}}}
+{{/if}}
+{{#if remainingCalories}}
+- Remaining Calorie Budget: {{{remainingCalories}}} kcal for all suggested meals combined.
+- The total calories of all suggested meals MUST NOT exceed the remaining calorie budget.
+{{/if}}
+
+**Task:**
+- Suggest exactly {{{numberOfMeals}}} meals that satisfy these requirements.
+`,
 });
 
 const suggestMealsFlow = ai.defineFlow(
@@ -71,8 +87,19 @@ const suggestMealsFlow = ai.defineFlow(
     inputSchema: SuggestMealsInputSchema,
     outputSchema: SuggestMealsOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    try {
+      const {output} = await prompt(input);
+      // If the output is invalid or doesn't contain the meals array,
+      // return an empty list of meals to prevent frontend errors.
+      if (!output || !Array.isArray(output.meals)) {
+        return {meals: []};
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in suggestMealsFlow:", error);
+      // On any error, return a safe, empty object to prevent crashes.
+      return { meals: [] };
+    }
   }
 );

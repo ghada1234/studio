@@ -33,6 +33,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 export default function AnalyzePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dishName, setDishName] = useState('');
+  const [portionSize, setPortionSize] = useState('');
   const [loadingSource, setLoadingSource] = React.useState<
     'idle' | 'image' | 'dish'
   >('idle');
@@ -63,28 +64,25 @@ export default function AnalyzePage() {
   }, [user, authLoading, router, t]);
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
-    const getCameraPermission = async () => {
-      // Only run if the camera tab is active
-      if (activeTab !== 'camera') {
-        if (stream) {
-          stream.getTracks().forEach((track) => track.stop());
-        }
-        return;
+    if (activeTab !== 'camera') {
+      if (videoRef.current?.srcObject) {
+        const mediaStream = videoRef.current.srcObject as MediaStream;
+        mediaStream.getTracks().forEach((track) => track.stop());
+        videoRef.current.srcObject = null;
       }
+      return;
+    }
 
-      // Reset permission state when tab is activated
+    let stream: MediaStream;
+    const getCameraPermission = async () => {
       setHasCameraPermission(null);
-
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode },
         });
-        stream = newStream; // Assign to local variable
         setHasCameraPermission(true);
-
         if (videoRef.current) {
-          videoRef.current.srcObject = newStream;
+          videoRef.current.srcObject = stream;
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
@@ -99,13 +97,13 @@ export default function AnalyzePage() {
 
     getCameraPermission();
 
-    // Cleanup function
     return () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [activeTab, t, toast, facingMode]);
+  }, [activeTab, facingMode, t, toast]);
+
 
   if (authLoading || !user) {
     return (
@@ -115,7 +113,7 @@ export default function AnalyzePage() {
     );
   }
 
-  const analyzeImageDataUri = async (dataUri: string) => {
+  const analyzeImageDataUri = async (dataUri: string, portion: string) => {
     if (!dataUri) return;
 
     setLoadingSource('image');
@@ -124,6 +122,7 @@ export default function AnalyzePage() {
     try {
       const analysisResult = await analyzeFoodImage({
         photoDataUri: dataUri,
+        portionSize: portion || undefined,
       });
       setResult(analysisResult);
       toast({
@@ -157,7 +156,7 @@ export default function AnalyzePage() {
     setPreviewUrl(null);
 
     try {
-      const analysisResult = await analyzeDishName({ dishName });
+      const analysisResult = await analyzeDishName({ dishName, portionSize });
       setResult(analysisResult);
       toast({
         title: t('analyze.reviewCard.success_toast_title'),
@@ -177,7 +176,17 @@ export default function AnalyzePage() {
 
   const handleCaptureAndAnalyze = async () => {
     if (!videoRef.current || !canvasRef.current) return;
+  
     const video = videoRef.current;
+    if (video.readyState < video.HAVE_ENOUGH_DATA) {
+      toast({
+        title: t('analyze.cameraCard.error_camera_not_ready_title'),
+        description: t('analyze.cameraCard.error_camera_not_ready_description'),
+        variant: 'destructive',
+      });
+      return;
+    }
+  
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -186,8 +195,8 @@ export default function AnalyzePage() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUri = canvas.toDataURL('image/jpeg');
       setPreviewUrl(dataUri);
-      setDishName('');
-      await analyzeImageDataUri(dataUri);
+      setDishName(''); // Clear dish name when analyzing image
+      await analyzeImageDataUri(dataUri, portionSize);
     }
   };
 
@@ -196,22 +205,22 @@ export default function AnalyzePage() {
 
     addMeal({
       name:
-        result.foodItems.join(', ') ||
+        result.foodItems?.join(', ') ||
         dishName ||
         t('analyze.analyzedMealName'),
-      calories: result.estimatedCalories,
-      protein: result.protein,
-      carbs: result.carbs,
-      fat: result.fat,
-      fiber: result.fiber,
-      sugar: result.sugar,
-      sodium: result.sodium,
-      potassium: result.potassium,
-      calcium: result.calcium,
-      iron: result.iron,
-      vitaminA: result.vitaminA,
-      vitaminC: result.vitaminC,
-      vitaminD: result.vitaminD,
+      calories: result.estimatedCalories ?? 0,
+      protein: result.protein ?? 0,
+      carbs: result.carbs ?? 0,
+      fat: result.fat ?? 0,
+      fiber: result.fiber ?? 0,
+      sugar: result.sugar ?? 0,
+      sodium: result.sodium ?? 0,
+      potassium: result.potassium ?? 0,
+      calcium: result.calcium ?? 0,
+      iron: result.iron ?? 0,
+      vitaminA: result.vitaminA ?? 0,
+      vitaminC: result.vitaminC ?? 0,
+      vitaminD: result.vitaminD ?? 0,
       imageUrl: previewUrl || undefined,
     });
 
@@ -222,6 +231,7 @@ export default function AnalyzePage() {
     setResult(null);
     setPreviewUrl(null);
     setDishName('');
+    setPortionSize('');
   };
 
   return (
@@ -276,6 +286,13 @@ export default function AnalyzePage() {
                       setDishName(e.target.value);
                       setPreviewUrl(null);
                     }}
+                    className="w-full"
+                  />
+                  <Input
+                    type="text"
+                    placeholder={t('analyze.searchCard.portion_placeholder')}
+                    value={portionSize}
+                    onChange={(e) => setPortionSize(e.target.value)}
                     className="w-full"
                   />
                   <Button
@@ -335,6 +352,13 @@ export default function AnalyzePage() {
                     )}
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
+                   <Input
+                    type="text"
+                    placeholder={t('analyze.cameraCard.portion_placeholder')}
+                    value={portionSize}
+                    onChange={(e) => setPortionSize(e.target.value)}
+                    className="w-full"
+                  />
                   <div className="flex gap-2">
                     <Button
                       onClick={handleCaptureAndAnalyze}
@@ -401,7 +425,7 @@ export default function AnalyzePage() {
                     {t('analyze.reviewCard.identifiedItems')}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {result.foodItems.join(', ')}
+                    {result.foodItems?.join(', ') || t('analyze.reviewCard.no_items_found')}
                   </p>
                 </div>
                 <div>
@@ -409,7 +433,7 @@ export default function AnalyzePage() {
                     {t('analyze.reviewCard.estimatedCalories')}
                   </h3>
                   <p className="text-sm text-primary font-bold">
-                    ~{result.estimatedCalories} {t('dashboard.units.kcal')}
+                    ~{result.estimatedCalories ?? 0} {t('dashboard.units.kcal')}
                   </p>
                 </div>
 
@@ -422,73 +446,73 @@ export default function AnalyzePage() {
                       {t('dashboard.nutrients.protein')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.protein?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.protein ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.carbs')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.carbs?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.carbs ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.fat')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.fat?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.fat ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.fiber')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.fiber?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.fiber ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.sugar')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.sugar?.toFixed(1)} {t('dashboard.units.g')}
+                      {(result.sugar ?? 0).toFixed(1)} {t('dashboard.units.g')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.sodium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.sodium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.sodium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.potassium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.potassium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.potassium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.calcium')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.calcium?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.calcium ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.iron')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.iron?.toFixed(1)} {t('dashboard.units.mg')}
+                      {(result.iron ?? 0).toFixed(1)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminA')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminA?.toFixed(0)} {t('dashboard.units.mcg')}
+                      {(result.vitaminA ?? 0).toFixed(0)} {t('dashboard.units.mcg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminC')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminC?.toFixed(0)} {t('dashboard.units.mg')}
+                      {(result.vitaminC ?? 0).toFixed(0)} {t('dashboard.units.mg')}
                     </span>
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.vitaminD')}:
                     </span>
                     <span className="text-left font-medium rtl:text-right">
-                      {result.vitaminD?.toFixed(0)} {t('dashboard.units.mcg')}
+                      {(result.vitaminD ?? 0).toFixed(0)} {t('dashboard.units.mcg')}
                     </span>
                   </div>
                 </div>

@@ -95,6 +95,7 @@
     "searchCard": {
       "description": "أدخل اسم طبق للحصول على تقدير غذائي.",
       "placeholder": "مثال: سباغيتي بولونيز",
+      "portion_placeholder": "حجم الحصة (مثال: 1 كوب، 100 جرام)",
       "button_loading": "جاري البحث...",
       "button": "ابحث عن الطبق",
       "error_no_dish_title": "لم يتم إدخال اسم الطبق",
@@ -102,10 +103,13 @@
     },
     "cameraCard": {
       "description": "وجّه الكاميرا نحو وجبتك والتقط صورة.",
+      "portion_placeholder": "حجم الحصة (اختياري)",
       "button_loading": "يتم التحليل...",
       "button": "التقاط وتحليل",
       "error_permission_title": "تم رفض الوصول إلى الكاميرا",
-      "error_permission_description": "الرجاء تمكين أذونات الكاميرا في إعدادات متصفحك لاستخدام هذه الميزة."
+      "error_permission_description": "الرجاء تمكين أذونات الكاميرا في إعدادات متصفحك لاستخدام هذه الميزة.",
+      "error_camera_not_ready_title": "الكاميرا ليست جاهزة",
+      "error_camera_not_ready_description": "الرجاء الانتظار لحظة حتى يتم تهيئة الكاميرا."
     },
     "reviewCard": {
       "title": "2. مراجعة التحليل",
@@ -113,6 +117,7 @@
       "loading": "جاري تحليل...",
       "placeholder": "ستظهر نتائج التحليل هنا.",
       "identifiedItems": "العناصر الغذائية المحددة",
+      "no_items_found": "لم يتم التعرف على أي مواد غذائية.",
       "estimatedCalories": "السعرات الحرارية التقديرية",
       "estimatedNutrients": "العناصر الغذائية التقديرية",
       "add_to_log_button": "إضافة إلى السجل اليومي",
