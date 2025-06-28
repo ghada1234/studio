@@ -45,7 +45,7 @@ import { useTranslation } from '@/hooks/use-translation';
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { t, setLanguage } = useTranslation();
+  const { t, setLanguage, dir } = useTranslation();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -77,6 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         variant="inset"
         collapsible="icon"
         className="bg-sidebar text-sidebar-foreground border-sidebar-border"
+        side={dir === 'rtl' ? 'right' : 'left'}
       >
         <SidebarHeader className="border-b border-sidebar-border p-4">
           <Link href="/" className="flex items-center gap-3">
