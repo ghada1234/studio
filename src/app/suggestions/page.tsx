@@ -27,6 +27,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Sparkles, Utensils } from 'lucide-react';
 import type { SuggestMealsOutput } from '@/ai/flows/suggest-meals';
+import { useDailyLog } from '@/hooks/use-daily-log';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   dietaryPreferences: z.string().min(2, {
@@ -37,12 +39,17 @@ const formSchema = z.object({
     .min(2, { message: 'Please enter your nutrient needs.' }),
   dislikedIngredients: z.string().optional(),
   numberOfMeals: z.coerce.number().min(1).max(10),
+  useRemainingCalories: z.boolean().default(false),
 });
 
 export default function SuggestionsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<SuggestMealsOutput | null>(null);
   const { toast } = useToast();
+  const { meals, calorieGoal } = useDailyLog();
+
+  const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
+  const remainingCalories = Math.max(0, calorieGoal - totalCalories);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,6 +58,7 @@ export default function SuggestionsPage() {
       nutrientNeeds: 'High protein',
       dislikedIngredients: '',
       numberOfMeals: 3,
+      useRemainingCalories: false,
     },
   });
 
@@ -58,7 +66,12 @@ export default function SuggestionsPage() {
     setIsLoading(true);
     setResult(null);
     try {
-      const suggestionResult = await suggestMeals(values);
+      const suggestionResult = await suggestMeals({
+        ...values,
+        remainingCalories: values.useRemainingCalories
+          ? remainingCalories
+          : undefined,
+      });
       setResult(suggestionResult);
     } catch (error) {
       console.error('Suggestion failed:', error);
@@ -102,7 +115,10 @@ export default function SuggestionsPage() {
                     <FormItem>
                       <FormLabel>Dietary Preferences</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Vegetarian, Low-FODMAP" {...field} />
+                        <Input
+                          placeholder="e.g., Vegetarian, Low-FODMAP"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -115,7 +131,10 @@ export default function SuggestionsPage() {
                     <FormItem>
                       <FormLabel>Nutrient Needs</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., High fiber, Low carb" {...field} />
+                        <Input
+                          placeholder="e.g., High fiber, Low carb"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -128,7 +147,10 @@ export default function SuggestionsPage() {
                     <FormItem>
                       <FormLabel>Disliked Ingredients (optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="e.g., Cilantro, Mushrooms" {...field} />
+                        <Input
+                          placeholder="e.g., Cilantro, Mushrooms"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         Comma-separated list of ingredients to avoid.
@@ -147,6 +169,34 @@ export default function SuggestionsPage() {
                         <Input type="number" {...field} />
                       </FormControl>
                       <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="useRemainingCalories"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border bg-muted/20 p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          id="use-remaining"
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel htmlFor="use-remaining">
+                          Base on remaining calories
+                        </FormLabel>
+                        <FormDescription>
+                          Suggest meals that fit within your remaining{' '}
+                          <span className="font-bold text-primary">
+                            {remainingCalories.toFixed(0)} kcal
+                          </span>
+                          .
+                        </FormDescription>
+                      </div>
                     </FormItem>
                   )}
                 />

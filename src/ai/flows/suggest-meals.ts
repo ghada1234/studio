@@ -23,6 +23,10 @@ const SuggestMealsInputSchema = z.object({
     .optional()
     .describe('Ingredients that the user dislikes, comma separated (e.g. broccoli, beans)'),
   numberOfMeals: z.number().describe('The number of meals to suggest.'),
+  remainingCalories: z
+    .number()
+    .optional()
+    .describe('The remaining calories for the day to fit the meals into.'),
 });
 export type SuggestMealsInput = z.infer<typeof SuggestMealsInputSchema>;
 
@@ -47,8 +51,15 @@ const prompt = ai.definePrompt({
   Given the following dietary preferences: {{{dietaryPreferences}}}
   And the following nutrient needs: {{{nutrientNeeds}}}
   And disliked ingredients: {{{dislikedIngredients}}}
+  {{#if remainingCalories}}
+  And a remaining calorie budget of {{{remainingCalories}}} kcal for all suggested meals combined.
+  {{/if}}
 
   Suggest {{{numberOfMeals}}} meals that satisfy these requirements.
+  {{#if remainingCalories}}
+  Make sure the total calories of all suggested meals do not exceed {{{remainingCalories}}} kcal.
+  Also include the estimated calories for each meal suggestion. For example: "Grilled Salmon with Asparagus (~450 calories)".
+  {{/if}}
 
   Return the list of meals as a JSON array of strings.
   `,
