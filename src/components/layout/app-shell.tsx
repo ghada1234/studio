@@ -75,6 +75,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar
         variant="inset"
+        collapsible="icon"
         className="bg-sidebar text-sidebar-foreground border-sidebar-border"
       >
         <SidebarHeader className="border-b border-sidebar-border p-4">
@@ -121,7 +122,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         >
           <div className="flex items-center gap-2">
-            <SidebarTrigger className="md:hidden" />
+            <SidebarTrigger />
             <Link href="/" className="flex items-center gap-2 md:hidden">
               <NutriSnapLogo className="h-6 w-6 text-primary" />
               <span className="font-headline text-lg font-semibold leading-tight">

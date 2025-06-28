@@ -1,3 +1,4 @@
+
 {
   "nav": {
     "dashboard": "Dashboard",
@@ -79,7 +80,8 @@
     },
     "tabs": {
       "image": "By Image",
-      "search": "By Name"
+      "search": "By Name",
+      "camera": "By Camera"
     },
     "uploadCard": {
       "description": "Choose a clear picture of your meal.",
@@ -96,6 +98,13 @@
       "button": "Search Dish",
       "error_no_dish_title": "No Dish Name Entered",
       "error_no_dish_description": "Please enter a dish name to search."
+    },
+    "cameraCard": {
+      "description": "Point your camera at the meal and snap a picture.",
+      "button_loading": "Analyzing...",
+      "button": "Capture & Analyze",
+      "error_permission_title": "Camera Access Denied",
+      "error_permission_description": "Please enable camera permissions in your browser settings to use this feature."
     },
     "reviewCard": {
       "title": "2. Review Analysis",

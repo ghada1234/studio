@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { analyzeFoodImage } from '@/ai/flows/analyze-food-image';
 import { analyzeDishName } from '@/ai/flows/analyze-dish-name';
 import {
@@ -20,12 +21,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLog } from '@/hooks/use-daily-log';
-import { Loader2, UploadCloud, Search } from 'lucide-react';
+import { Loader2, UploadCloud, Search, Camera } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -37,9 +40,16 @@ export default function AnalyzePage() {
   const [result, setResult] = useState<AnalyzeFoodImageOutput | null>(null);
   const { toast } = useToast();
   const { addMeal } = useDailyLog();
-  const { t } = useTranslation();
+  const { t, dir } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('image');
+  const [hasCameraPermission, setHasCameraPermission] = useState<
+    boolean | null
+  >(null);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const isLoading = loadingSource !== 'idle';
 
@@ -49,6 +59,51 @@ export default function AnalyzePage() {
       router.push('/login');
     }
   }, [user, authLoading, router, t]);
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    const getCameraPermission = async () => {
+      // Only run if the camera tab is active
+      if (activeTab !== 'camera') {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        return;
+      }
+
+      // Reset permission state when tab is activated
+      setHasCameraPermission(null);
+
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        stream = newStream; // Assign to local variable
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: t('analyze.cameraCard.error_permission_title'),
+          description: t('analyze.cameraCard.error_permission_description'),
+        });
+      }
+    };
+
+    getCameraPermission();
+
+    // Cleanup function
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [activeTab, t, toast]);
 
   if (authLoading || !user) {
     return (
@@ -72,22 +127,15 @@ export default function AnalyzePage() {
     }
   };
 
-  const handleAnalyzeImage = async () => {
-    if (!file || !previewUrl) {
-      toast({
-        title: t('analyze.uploadCard.error_no_file_title'),
-        description: t('analyze.uploadCard.error_no_file_description'),
-        variant: 'destructive',
-      });
-      return;
-    }
+  const analyzeImageDataUri = async (dataUri: string) => {
+    if (!dataUri) return;
 
     setLoadingSource('image');
     setResult(null);
 
     try {
       const analysisResult = await analyzeFoodImage({
-        photoDataUri: previewUrl,
+        photoDataUri: dataUri,
       });
       setResult(analysisResult);
       toast({
@@ -106,6 +154,19 @@ export default function AnalyzePage() {
     }
   };
 
+  const handleAnalyzeImage = async () => {
+    if (!file || !previewUrl) {
+      toast({
+        title: t('analyze.uploadCard.error_no_file_title'),
+        description: t('analyze.uploadCard.error_no_file_description'),
+        variant: 'destructive',
+      });
+      return;
+    }
+    setDishName('');
+    await analyzeImageDataUri(previewUrl);
+  };
+
   const handleAnalyzeDishName = async () => {
     if (!dishName.trim()) {
       toast({
@@ -118,7 +179,7 @@ export default function AnalyzePage() {
 
     setLoadingSource('dish');
     setResult(null);
-    setFile(null); // Clear file upload state
+    setFile(null);
     setPreviewUrl(null);
 
     try {
@@ -140,12 +201,31 @@ export default function AnalyzePage() {
     }
   };
 
+  const handleCaptureAndAnalyze = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    if (context) {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUri = canvas.toDataURL('image/jpeg');
+      setPreviewUrl(dataUri);
+      setFile(null); // Unset file if we are using camera
+      setDishName(''); // Unset dish name
+      await analyzeImageDataUri(dataUri);
+    }
+  };
+
   const handleAddMeal = () => {
     if (!result) return;
 
     addMeal({
       name:
-        result.foodItems.join(', ') || dishName || t('analyze.analyzedMealName'),
+        result.foodItems.join(', ') ||
+        dishName ||
+        t('analyze.analyzedMealName'),
       calories: result.estimatedCalories,
       protein: result.protein,
       carbs: result.carbs,
@@ -192,13 +272,29 @@ export default function AnalyzePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="image" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+            <Tabs
+              defaultValue="image"
+              className="w-full"
+              onValueChange={setActiveTab}
+            >
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="image">
+                  <UploadCloud
+                    className={cn('h-4 w-4', dir === 'ltr' ? 'mr-2' : 'ml-2')}
+                  />
                   {t('analyze.tabs.image')}
                 </TabsTrigger>
                 <TabsTrigger value="search">
+                  <Search
+                    className={cn('h-4 w-4', dir === 'ltr' ? 'mr-2' : 'ml-2')}
+                  />
                   {t('analyze.tabs.search')}
+                </TabsTrigger>
+                <TabsTrigger value="camera">
+                  <Camera
+                    className={cn('h-4 w-4', dir === 'ltr' ? 'mr-2' : 'ml-2')}
+                  />
+                  {t('analyze.tabs.camera')}
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="image" className="pt-4">
@@ -214,7 +310,7 @@ export default function AnalyzePage() {
                       onChange={handleFileChange}
                       className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
                     />
-                    {previewUrl ? (
+                    {previewUrl && activeTab === 'image' ? (
                       <Image
                         src={previewUrl}
                         alt="Meal preview"
@@ -234,9 +330,9 @@ export default function AnalyzePage() {
                     disabled={!file || isLoading}
                     className="w-full"
                   >
-                    {loadingSource === 'image' ? (
+                    {loadingSource === 'image' && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : null}
+                    )}
                     {loadingSource === 'image'
                       ? t('analyze.uploadCard.button_loading')
                       : t('analyze.uploadCard.button')}
@@ -267,11 +363,66 @@ export default function AnalyzePage() {
                     {loadingSource === 'dish' ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
-                      <Search className="mr-2 h-4 w-4" />
+                      <Search
+                        className={cn(
+                          'h-4 w-4',
+                          dir === 'ltr' ? 'mr-2' : 'ml-2'
+                        )}
+                      />
                     )}
                     {loadingSource === 'dish'
                       ? t('analyze.searchCard.button_loading')
                       : t('analyze.searchCard.button')}
+                  </Button>
+                </div>
+              </TabsContent>
+              <TabsContent value="camera" className="pt-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t('analyze.cameraCard.description')}
+                  </p>
+                  <div className="relative flex h-64 w-full items-center justify-center overflow-hidden rounded-lg border-2 border-dashed bg-muted/50">
+                    <video
+                      ref={videoRef}
+                      className="h-full w-full object-contain"
+                      autoPlay
+                      playsInline
+                      muted
+                    />
+                    {hasCameraPermission === false && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Alert variant="destructive" className="m-4">
+                          <AlertTitle>
+                            {t('analyze.cameraCard.error_permission_title')}
+                          </AlertTitle>
+                          <AlertDescription>
+                            {t(
+                              'analyze.cameraCard.error_permission_description'
+                            )}
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+                    {hasCameraPermission === null && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                          <Loader2 className="h-10 w-10 animate-spin" />
+                        </div>
+                      </div>
+                    )}
+                    <canvas ref={canvasRef} className="hidden" />
+                  </div>
+                  <Button
+                    onClick={handleCaptureAndAnalyze}
+                    disabled={hasCameraPermission !== true || isLoading}
+                    className="w-full"
+                  >
+                    {loadingSource === 'image' ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    {loadingSource === 'image'
+                      ? t('analyze.cameraCard.button_loading')
+                      : t('analyze.cameraCard.button')}
                   </Button>
                 </div>
               </TabsContent>
