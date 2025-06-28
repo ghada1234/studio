@@ -33,7 +33,7 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are a nutritional expert. Analyze the dish name provided: {{{dishName}}}.
+  prompt: `You are a nutritional expert with a vast knowledge of international cuisine, including dishes from all over the world such as the Middle East (Iraq, Lebanon, Syria, Yemen, UAE, etc.), Asia, Europe, Africa, and the Americas. Analyze the dish name provided: {{{dishName}}}.
 
 Based on a typical preparation of this dish, provide an estimation of the total calories and the following nutrients:
 - Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
