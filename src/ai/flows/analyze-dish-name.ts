@@ -38,36 +38,19 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `Analyze the nutritional content of the following dish.
+  prompt: `You are a nutrition analysis expert. Your task is to analyze the provided dish name and portion size and return a valid JSON object that strictly adheres to the provided JSON schema.
 
-Dish: {{{dishName}}}
+**CRITICAL INSTRUCTIONS:**
+1.  You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting.
+2.  All nutritional values must be NUMBERS. Do not include units (e.g., "g" or "kcal").
+3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
+4.  If the input is not a recognizable food item, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
+
+**Dish to Analyze:**
+- Name: {{{dishName}}}
 {{#if portionSize}}
-Portion: {{{portionSize}}}
+- Portion Size: {{{portionSize}}}
 {{/if}}
-
-Your task is to identify the food items and estimate their nutritional content.
-- Return ONLY a valid JSON object adhering to the specified schema.
-- Identify the individual food items.
-- Provide estimates for all available nutritional values.
-- All nutritional values MUST be numbers. Do not include units (e.g., "g" or "kcal").
-- If a specific nutritional value cannot be estimated, OMIT the key from the JSON object. Do not use placeholder values like 0, null, or "N/A".
-- If the input is not a recognizable food, return a JSON object with an empty "foodItems" array and omit all other fields.
-
-Example of a valid response for "A slice of cheese pizza":
-{
-  "foodItems": ["pizza crust", "tomato sauce", "cheese"],
-  "estimatedCalories": 285,
-  "protein": 12,
-  "carbs": 36,
-  "fat": 10
-}
-
-Example for an input where only calories and protein can be estimated:
-{
-  "foodItems": ["mystery meat"],
-  "estimatedCalories": 200,
-  "protein": 30
-}
 `,
   config: {
     safetySettings: [

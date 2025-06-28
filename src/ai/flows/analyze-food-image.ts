@@ -41,29 +41,19 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `Analyze the nutritional content of the meal in the following image.
+  prompt: `You are a nutrition analysis expert. Your task is to analyze the provided meal image and portion size and return a valid JSON object that strictly adheres to the provided JSON schema.
 
-Image: {{media url=photoDataUri}}
+**CRITICAL INSTRUCTIONS:**
+1.  You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting.
+2.  All nutritional values must be NUMBERS. Do not include units (e.g., "g" or "kcal").
+3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
+4.  If the image does not appear to contain food, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
+
+**Image to Analyze:**
+{{media url=photoDataUri}}
 {{#if portionSize}}
-Portion: {{{portionSize}}}
+- Portion Size: {{{portionSize}}}
 {{/if}}
-
-Your task is to identify the food items and estimate their nutritional content from the image.
-- Return ONLY a valid JSON object adhering to the specified schema.
-- Identify the individual food items in the image.
-- Provide estimates for all available nutritional values. Use the provided portion size if available, otherwise estimate from the image.
-- All nutritional values MUST be numbers. Do not include units (e.g., "g" or "kcal").
-- If a specific nutritional value cannot be estimated, OMIT the key from the JSON object. Do not use placeholder values like 0, null, or "N/A".
-- If the image does not contain food, return a JSON object with an empty "foodItems" array and omit all other fields.
-
-Example of a valid response for an image of a salad:
-{
-  "foodItems": ["lettuce", "tomato", "cucumber", "chicken breast", "croutons", "caesar dressing"],
-  "estimatedCalories": 350,
-  "protein": 25,
-  "carbs": 15,
-  "fat": 20
-}
 `,
   config: {
     safetySettings: [
