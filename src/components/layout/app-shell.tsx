@@ -69,9 +69,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarHeader className="border-b border-sidebar-border p-4">
           <Link href="/" className="flex items-center gap-3">
             <NutriSnapLogo className="h-8 w-8 text-primary" />
-            <h2 className="font-headline text-2xl font-semibold tracking-tighter group-data-[collapsible=icon]:hidden">
-              NutriSnap
-            </h2>
+            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+              <h2 className="font-headline text-2xl font-semibold leading-tight tracking-tighter">
+                NutriSnap
+              </h2>
+              <p className="text-xs text-muted-foreground">لقطة غذائية</p>
+            </div>
           </Link>
         </SidebarHeader>
 
@@ -134,9 +137,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             'sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm md:hidden'
           )}
         >
-          <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold">
+          <Link href="/" className="flex items-center gap-2">
              <NutriSnapLogo className="h-6 w-6 text-primary" />
-             NutriSnap
+             <div className="flex flex-col">
+                <span className="font-headline text-lg font-semibold leading-tight">NutriSnap</span>
+                <span className="text-xs text-muted-foreground">لقطة غذائية</span>
+              </div>
           </Link>
           <SidebarTrigger />
         </header>
