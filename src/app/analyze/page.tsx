@@ -16,6 +16,7 @@ import { useDailyLog } from '@/hooks/use-daily-log';
 import { Loader2, UploadCloud } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
+import { useTranslation } from '@/hooks/use-translation';
 
 export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -24,6 +25,12 @@ export default function AnalyzePage() {
   const [result, setResult] = useState<AnalyzeFoodImageOutput | null>(null);
   const { toast } = useToast();
   const { addMeal } = useDailyLog();
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    document.title = `${t('analyze.title')} - NutriSnap`;
+  }, [t]);
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -34,15 +41,15 @@ export default function AnalyzePage() {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
-      setResult(null); // Reset result on new file
+      setResult(null);
     }
   };
 
   const handleAnalyze = async () => {
     if (!file || !previewUrl) {
       toast({
-        title: 'لم يتم تحديد أي ملف',
-        description: 'الرجاء اختيار صورة لتحليلها.',
+        title: t('analyze.uploadCard.error_no_file_title'),
+        description: t('analyze.uploadCard.error_no_file_description'),
         variant: 'destructive',
       });
       return;
@@ -57,14 +64,14 @@ export default function AnalyzePage() {
       });
       setResult(analysisResult);
       toast({
-        title: 'اكتمل التحليل!',
-        description: 'المعلومات الغذائية التقديرية متاحة الآن.',
+        title: t('analyze.reviewCard.success_toast_title'),
+        description: t('analyze.reviewCard.success_toast_description'),
       });
     } catch (error) {
       console.error('Analysis failed:', error);
       toast({
-        title: 'فشل التحليل',
-        description: 'تعذر تحليل الصورة. يرجى تجربة صورة أخرى.',
+        title: t('analyze.reviewCard.error_toast_title'),
+        description: t('analyze.reviewCard.error_toast_description'),
         variant: 'destructive',
       });
     } finally {
@@ -76,7 +83,7 @@ export default function AnalyzePage() {
     if (!result) return;
 
     addMeal({
-      name: result.foodItems.join(', ') || 'وجبة تم تحليلها',
+      name: result.foodItems.join(', ') || t('analyze.analyzedMealName'),
       calories: result.estimatedCalories,
       protein: result.protein,
       carbs: result.carbs,
@@ -94,8 +101,8 @@ export default function AnalyzePage() {
     });
 
     toast({
-      title: 'تم تسجيل الوجبة!',
-      description: 'تمت إضافة الوجبة التي تم تحليلها إلى لوحة التحكم اليومية الخاصة بك.',
+      title: t('analyze.reviewCard.log_success_toast_title'),
+      description: t('analyze.reviewCard.log_success_toast_description'),
     });
     setResult(null);
     setFile(null);
@@ -106,19 +113,17 @@ export default function AnalyzePage() {
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
         <h1 className="font-headline text-4xl font-bold">
-          تحليل الوجبة بالذكاء الاصطناعي
+          {t('analyze.header')}
         </h1>
-        <p className="text-muted-foreground">
-          حمّل صورة لوجبتك ودع الذكاء الاصطناعي يقوم بالعمل الشاق.
-        </p>
+        <p className="text-muted-foreground">{t('analyze.description')}</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">1. تحميل الصورة</CardTitle>
+            <CardTitle className="font-headline">{t('analyze.uploadCard.title')}</CardTitle>
             <CardDescription>
-              اختر صورة واضحة لوجبتك.
+              {t('analyze.uploadCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -134,14 +139,14 @@ export default function AnalyzePage() {
                 <Image
                   src={previewUrl}
                   alt="Meal preview"
-                  layout="fill"
-                  objectFit="contain"
+                  fill
+                  style={{ objectFit: 'contain' }}
                   className="rounded-lg p-2"
                 />
               ) : (
                 <div className="flex flex-col items-center text-muted-foreground">
                   <UploadCloud className="mb-2 h-10 w-10" />
-                  <p>انقر أو اسحب للتحميل</p>
+                  <p>{t('analyze.uploadCard.cta')}</p>
                 </div>
               )}
             </div>
@@ -153,67 +158,67 @@ export default function AnalyzePage() {
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : null}
-              {isLoading ? 'يتم التحليل...' : 'تحليل الوجبة'}
+              {isLoading ? t('analyze.uploadCard.button_loading') : t('analyze.uploadCard.button')}
             </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">2. مراجعة التحليل</CardTitle>
+            <CardTitle className="font-headline">{t('analyze.reviewCard.title')}</CardTitle>
             <CardDescription>
-              إليك المعلومات الغذائية التقديرية.
+              {t('analyze.reviewCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && (
               <div className="flex flex-col items-center justify-center space-y-2 pt-10 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p>جاري تحليل الصورة...</p>
+                <p>{t('analyze.reviewCard.loading')}</p>
               </div>
             )}
             {result ? (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold">العناصر الغذائية المحددة</h3>
+                  <h3 className="font-semibold">{t('analyze.reviewCard.identifiedItems')}</h3>
                   <p className="text-sm text-muted-foreground">
                     {result.foodItems.join(', ')}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold">السعرات الحرارية التقديرية</h3>
+                  <h3 className="font-semibold">{t('analyze.reviewCard.estimatedCalories')}</h3>
                   <p className="text-sm text-primary font-bold">
-                    ~{result.estimatedCalories} سعرة حرارية
+                    ~{result.estimatedCalories} {t('dashboard.units.kcal')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">العناصر الغذائية التقديرية</h3>
+                  <h3 className="font-semibold">{t('analyze.reviewCard.estimatedNutrients')}</h3>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                    <span className="text-muted-foreground">بروتين:</span>
-                    <span className="text-left font-medium">{result.protein?.toFixed(1)} غ</span>
-                    <span className="text-muted-foreground">كربوهيدرات:</span>
-                    <span className="text-left font-medium">{result.carbs?.toFixed(1)} غ</span>
-                    <span className="text-muted-foreground">دهون:</span>
-                    <span className="text-left font-medium">{result.fat?.toFixed(1)} غ</span>
-                    <span className="text-muted-foreground">ألياف:</span>
-                    <span className="text-left font-medium">{result.fiber?.toFixed(1)} غ</span>
-                     <span className="text-muted-foreground">سكر:</span>
-                    <span className="text-left font-medium">{result.sugar?.toFixed(1)} غ</span>
-                    <span className="text-muted-foreground">صوديوم:</span>
-                    <span className="text-left font-medium">{result.sodium?.toFixed(0)} ملغ</span>
-                    <span className="text-muted-foreground">بوتاسيوم:</span>
-                    <span className="text-left font-medium">{result.potassium?.toFixed(0)} ملغ</span>
-                    <span className="text-muted-foreground">كالسيوم:</span>
-                    <span className="text-left font-medium">{result.calcium?.toFixed(0)} ملغ</span>
-                    <span className="text-muted-foreground">حديد:</span>
-                    <span className="text-left font-medium">{result.iron?.toFixed(1)} ملغ</span>
-                    <span className="text-muted-foreground">فيتامين أ:</span>
-                    <span className="text-left font-medium">{result.vitaminA?.toFixed(0)} مكغ</span>
-                    <span className="text-muted-foreground">فيتامين ج:</span>
-                    <span className="text-left font-medium">{result.vitaminC?.toFixed(0)} ملغ</span>
-                    <span className="text-muted-foreground">فيتامين د:</span>
-                    <span className="text-left font-medium">{result.vitaminD?.toFixed(0)} مكغ</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.protein')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.protein?.toFixed(1)} {t('dashboard.units.g')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.carbs')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.carbs?.toFixed(1)} {t('dashboard.units.g')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.fat')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.fat?.toFixed(1)} {t('dashboard.units.g')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.fiber')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.fiber?.toFixed(1)} {t('dashboard.units.g')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.sugar')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.sugar?.toFixed(1)} {t('dashboard.units.g')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.sodium')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.sodium?.toFixed(0)} {t('dashboard.units.mg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.potassium')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.potassium?.toFixed(0)} {t('dashboard.units.mg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.calcium')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.calcium?.toFixed(0)} {t('dashboard.units.mg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.iron')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.iron?.toFixed(1)} {t('dashboard.units.mg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminA')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.vitaminA?.toFixed(0)} {t('dashboard.units.mcg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminC')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.vitaminC?.toFixed(0)} {t('dashboard.units.mg')}</span>
+                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminD')}:</span>
+                    <span className="text-left font-medium rtl:text-right">{result.vitaminD?.toFixed(0)} {t('dashboard.units.mcg')}</span>
                   </div>
                 </div>
 
@@ -221,13 +226,13 @@ export default function AnalyzePage() {
                   onClick={handleAddMeal}
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 >
-                  إضافة إلى السجل اليومي
+                  {t('analyze.reviewCard.add_to_log_button')}
                 </Button>
               </div>
             ) : (
               !isLoading && (
                 <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                  <p>ستظهر نتائج التحليل هنا.</p>
+                  <p>{t('analyze.reviewCard.placeholder')}</p>
                 </div>
               )
             )}

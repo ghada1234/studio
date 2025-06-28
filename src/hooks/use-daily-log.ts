@@ -36,7 +36,11 @@ export function DailyLogProvider({ children }: { children: React.ReactNode }) {
     [meals, calorieGoal]
   );
 
-  return React.createElement(DailyLogContext.Provider, { value: contextValue }, children);
+  return React.createElement(
+    DailyLogContext.Provider,
+    { value: contextValue },
+    children
+  );
 }
 
 export const useDailyLog = () => {

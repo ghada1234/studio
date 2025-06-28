@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
   BrainCircuit,
   Camera,
+  Globe,
   LayoutDashboard,
   PlusCircle,
 } from 'lucide-react';
@@ -30,35 +31,41 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-
-const navItems = [
-  {
-    href: '/',
-    icon: LayoutDashboard,
-    label: 'لوحة التحكم',
-  },
-  {
-    href: '/analyze',
-    icon: Camera,
-    label: 'تحليل وجبة',
-  },
-  {
-    href: '/add-meal',
-    icon: PlusCircle,
-    label: 'إضافة وجبة',
-  },
-  {
-    href: '/suggestions',
-    icon: BrainCircuit,
-    label: 'اقتراحات الذكاء الاصطناعي',
-  },
-];
+import { useTranslation } from '@/hooks/use-translation';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { t, setLanguage } = useTranslation();
+
+  const navItems = [
+    {
+      href: '/',
+      icon: LayoutDashboard,
+      label: t('nav.dashboard'),
+    },
+    {
+      href: '/analyze',
+      icon: Camera,
+      label: t('nav.analyze'),
+    },
+    {
+      href: '/add-meal',
+      icon: PlusCircle,
+      label: t('nav.add'),
+    },
+    {
+      href: '/suggestions',
+      icon: BrainCircuit,
+      label: t('nav.suggestions'),
+    },
+  ];
 
   return (
     <SidebarProvider>
@@ -73,7 +80,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <h2 className="font-headline text-2xl font-semibold leading-tight tracking-tighter">
                 NutriSnap
               </h2>
-              <p className="text-xs text-muted-foreground">لقطة غذائية</p>
+              <p className="text-xs text-muted-foreground">
+                {t('appShell.subtitle')}
+              </p>
             </div>
           </Link>
         </SidebarHeader>
@@ -108,7 +117,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 className="flex w-full items-center justify-start gap-3 p-2 hover:bg-sidebar-accent"
               >
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar"/>
+                  <AvatarImage
+                    src="https://placehold.co/100x100.png"
+                    alt="User"
+                    data-ai-hint="person avatar"
+                  />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="text-left group-data-[collapsible=icon]:hidden">
@@ -120,12 +133,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="left" align="start">
-              <DropdownMenuLabel>حسابي</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('appShell.userMenu.myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>الملف الشخصي</DropdownMenuItem>
-              <DropdownMenuItem>الإعدادات</DropdownMenuItem>
+              <DropdownMenuItem>{t('appShell.userMenu.profile')}</DropdownMenuItem>
+              <DropdownMenuItem>{t('appShell.userMenu.settings')}</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>تسجيل الخروج</DropdownMenuItem>
+               <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Globe />
+                  <span>{t('appShell.userMenu.language')}</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onClick={() => setLanguage('en')}>
+                      English
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                      العربية
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>{t('appShell.userMenu.logout')}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarHeader>
@@ -138,11 +168,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           )}
         >
           <Link href="/" className="flex items-center gap-2">
-             <NutriSnapLogo className="h-6 w-6 text-primary" />
-             <div className="flex flex-col">
-                <span className="font-headline text-lg font-semibold leading-tight">نوتري سناب</span>
-                <span className="text-xs text-muted-foreground">لقطة غذائية</span>
-              </div>
+            <NutriSnapLogo className="h-6 w-6 text-primary" />
+            <div className="flex flex-col">
+              <span className="font-headline text-lg font-semibold leading-tight">
+                NutriSnap
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {t('appShell.subtitle')}
+              </span>
+            </div>
           </Link>
           <SidebarTrigger />
         </header>

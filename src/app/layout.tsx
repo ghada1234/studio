@@ -3,10 +3,12 @@ import './globals.css';
 import { AppShell } from '@/components/layout/app-shell';
 import { DailyLogProvider } from '@/hooks/use-daily-log';
 import { Toaster } from '@/components/ui/toaster';
+import { TranslationProvider } from '@/hooks/use-translation';
 
 export const metadata: Metadata = {
-  title: 'نوتري سناب',
-  description: 'حلل الوجبات، تتبع العناصر الغذائية، واحصل على اقتراحات مدعومة بالذكاء الاصطناعي.',
+  title: 'NutriSnap',
+  description:
+    'Analyze meals, track nutrients, and get AI-powered suggestions.',
 };
 
 export default function RootLayout({
@@ -15,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className="dark">
+    <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -29,10 +31,12 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-body antialiased">
-        <DailyLogProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster />
-        </DailyLogProvider>
+        <TranslationProvider>
+          <DailyLogProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster />
+          </DailyLogProvider>
+        </TranslationProvider>
       </body>
     </html>
   );

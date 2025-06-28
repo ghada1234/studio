@@ -26,29 +26,35 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { ChevronDown, ChevronsUpDown } from 'lucide-react';
-
-const chartConfig = {
-  calories: {
-    label: 'السعرات الحرارية',
-    color: 'hsl(var(--chart-1))',
-  },
-  protein: {
-    label: 'بروتين',
-    color: 'hsl(var(--chart-2))',
-  },
-  carbs: {
-    label: 'كربوهيدرات',
-    color: 'hsl(var(--chart-3))',
-  },
-  fat: {
-    label: 'دهون',
-    color: 'hsl(var(--chart-4))',
-  },
-} satisfies ChartConfig;
+import { useTranslation } from '@/hooks/use-translation';
 
 export default function DashboardPage() {
   const { meals, calorieGoal, setCalorieGoal } = useDailyLog();
   const [goalInput, setGoalInput] = React.useState(calorieGoal.toString());
+  const { t } = useTranslation();
+
+  React.useEffect(() => {
+    document.title = `${t('dashboard.title')} - NutriSnap`;
+  }, [t]);
+
+  const chartConfig = {
+    calories: {
+      label: t('dashboard.nutrients.calories'),
+      color: 'hsl(var(--chart-1))',
+    },
+    protein: {
+      label: t('dashboard.nutrients.protein'),
+      color: 'hsl(var(--chart-2))',
+    },
+    carbs: {
+      label: t('dashboard.nutrients.carbs'),
+      color: 'hsl(var(--chart-3))',
+    },
+    fat: {
+      label: t('dashboard.nutrients.fat'),
+      color: 'hsl(var(--chart-4))',
+    },
+  } satisfies ChartConfig;
 
   const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
   const totalProtein = meals.reduce((sum, meal) => sum + meal.protein, 0);
@@ -83,9 +89,9 @@ export default function DashboardPage() {
     calorieGoal > 0 ? (totalCalories / calorieGoal) * 100 : 0;
 
   const macroData = [
-    { name: 'بروتين', value: totalProtein, fill: 'var(--color-protein)' },
-    { name: 'كربوهيدرات', value: totalCarbs, fill: 'var(--color-carbs)' },
-    { name: 'دهون', value: totalFat, fill: 'var(--color-fat)' },
+    { name: t('dashboard.nutrients.protein'), value: totalProtein, fill: 'var(--color-protein)' },
+    { name: t('dashboard.nutrients.carbs'), value: totalCarbs, fill: 'var(--color-carbs)' },
+    { name: t('dashboard.nutrients.fat'), value: totalFat, fill: 'var(--color-fat)' },
   ];
 
   const handleSetGoal = () => {
@@ -98,41 +104,41 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">لوحة التحكم اليومية</h1>
-        <p className="text-muted-foreground">
-          إليك ملخصك الغذائي لهذا اليوم.
-        </p>
+        <h1 className="font-headline text-4xl font-bold">{t('dashboard.header')}</h1>
+        <p className="text-muted-foreground">{t('dashboard.description')}</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-headline">هدف السعرات الحرارية</CardTitle>
+            <CardTitle className="font-headline">
+              {t('dashboard.calorieCard.title')}
+            </CardTitle>
             <CardDescription>
-              حدد هدفك اليومي من السعرات الحرارية وتتبع تقدمك.
+              {t('dashboard.calorieCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
               <Input
                 type="number"
                 value={goalInput}
                 onChange={(e) => setGoalInput(e.target.value)}
-                placeholder="مثال: 2000"
+                placeholder={t('dashboard.calorieCard.placeholder')}
                 className="max-w-xs"
               />
-              <Button onClick={handleSetGoal}>تحديد الهدف</Button>
+              <Button onClick={handleSetGoal}>{t('dashboard.calorieCard.button')}</Button>
             </div>
             <div className="space-y-2">
               <div className="flex justify-between font-medium">
-                <span>{`استهلكت ${Math.round(totalCalories)} سعرة حرارية`}</span>
+                <span>{t('dashboard.calorieCard.consumed', { consumed: Math.round(totalCalories)})}</span>
                 <span className="text-muted-foreground">
-                  {`الهدف ${calorieGoal} سعرة حرارية`}
+                  {t('dashboard.calorieCard.goal', {goal: calorieGoal})}
                 </span>
               </div>
               <Progress
                 value={calorieProgress}
-                aria-label={`${calorieProgress.toFixed(0)}% من هدف السعرات الحرارية`}
+                aria-label={t('dashboard.calorieCard.progressLabel', {progress: calorieProgress.toFixed(0)})}
               />
             </div>
           </CardContent>
@@ -140,8 +146,8 @@ export default function DashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">المغذيات الكبرى</CardTitle>
-            <CardDescription>إجمالي الجرامات المستهلكة اليوم.</CardDescription>
+            <CardTitle className="font-headline">{t('dashboard.macroCard.title')}</CardTitle>
+            <CardDescription>{t('dashboard.macroCard.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-48 w-full">
@@ -157,7 +163,7 @@ export default function DashboardPage() {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={10}
-                  width={60}
+                  width={80}
                   reversed
                 />
                 <XAxis type="number" hide />
@@ -174,49 +180,49 @@ export default function DashboardPage() {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle className="font-headline">
-              ملخص المغذيات الدقيقة
+              {t('dashboard.microCard.title')}
             </CardTitle>
             <CardDescription>
-              إجمالي المغذيات الدقيقة المستهلكة اليوم.
+              {t('dashboard.microCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-x-8 gap-y-2 md:grid-cols-3 lg:grid-cols-4">
               <div>
-                <p className="text-sm text-muted-foreground">ألياف</p>
-                <p className="font-medium">{totalFiber.toFixed(1)} غ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.fiber')}</p>
+                <p className="font-medium">{totalFiber.toFixed(1)} {t('dashboard.units.g')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">سكر</p>
-                <p className="font-medium">{totalSugar.toFixed(1)} غ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.sugar')}</p>
+                <p className="font-medium">{totalSugar.toFixed(1)} {t('dashboard.units.g')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">صوديوم</p>
-                <p className="font-medium">{totalSodium.toFixed(0)} ملغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.sodium')}</p>
+                <p className="font-medium">{totalSodium.toFixed(0)} {t('dashboard.units.mg')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">بوتاسيوم</p>
-                <p className="font-medium">{totalPotassium.toFixed(0)} ملغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.potassium')}</p>
+                <p className="font-medium">{totalPotassium.toFixed(0)} {t('dashboard.units.mg')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">كالسيوم</p>
-                <p className="font-medium">{totalCalcium.toFixed(0)} ملغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.calcium')}</p>
+                <p className="font-medium">{totalCalcium.toFixed(0)} {t('dashboard.units.mg')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">حديد</p>
-                <p className="font-medium">{totalIron.toFixed(1)} ملغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.iron')}</p>
+                <p className="font-medium">{totalIron.toFixed(1)} {t('dashboard.units.mg')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">فيتامين أ</p>
-                <p className="font-medium">{totalVitaminA.toFixed(0)} مكغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.vitaminA')}</p>
+                <p className="font-medium">{totalVitaminA.toFixed(0)} {t('dashboard.units.mcg')}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">فيتامين ج</p>
-                <p className="font-medium">{totalVitaminC.toFixed(0)} ملغ</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.vitaminC')}</p>
+                <p className="font-medium">{totalVitaminC.toFixed(0)} {t('dashboard.units.mg')}</p>
               </div>
-               <div>
-                <p className="text-sm text-muted-foreground">فيتامين د</p>
-                <p className="font-medium">{totalVitaminD.toFixed(0)} مكغ</p>
+              <div>
+                <p className="text-sm text-muted-foreground">{t('dashboard.nutrients.vitaminD')}</p>
+                <p className="font-medium">{totalVitaminD.toFixed(0)} {t('dashboard.units.mcg')}</p>
               </div>
             </div>
           </CardContent>
@@ -224,9 +230,9 @@ export default function DashboardPage() {
 
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="font-headline">الوجبات المسجلة</CardTitle>
+            <CardTitle className="font-headline">{t('dashboard.loggedMealsCard.title')}</CardTitle>
             <CardDescription>
-              جميع وجباتك ووجباتك الخفيفة لهذا اليوم. انقر للتوسيع.
+             {t('dashboard.loggedMealsCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -239,30 +245,29 @@ export default function DashboardPage() {
                         <div className="flex-1">
                           <p className="font-semibold">{meal.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {meal.calories} سعرة حرارية &bull; ب: {meal.protein}غ &bull;
-                            ك: {meal.carbs}غ &bull; د: {meal.fat}غ
+                            {t('dashboard.loggedMealsCard.mealDetails', {calories: meal.calories, protein: meal.protein, carbs: meal.carbs, fat: meal.fat})}
                           </p>
                         </div>
                         <CollapsibleTrigger asChild>
                           <Button variant="ghost" size="sm" className="w-9 p-0">
                             <ChevronsUpDown className="h-4 w-4" />
-                            <span className="sr-only">تبديل</span>
+                            <span className="sr-only">{t('dashboard.loggedMealsCard.toggle')}</span>
                           </Button>
                         </CollapsibleTrigger>
                       </div>
                       <CollapsibleContent>
                         <div className="border-t px-4 py-2">
-                           <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
-                              <span className="text-muted-foreground">ألياف:</span><span className="text-left font-medium">{meal.fiber?.toFixed(1) ?? 'غير متاح'} غ</span>
-                              <span className="text-muted-foreground">سكر:</span><span className="text-left font-medium">{meal.sugar?.toFixed(1) ?? 'غير متاح'} غ</span>
-                              <span className="text-muted-foreground">صوديوم:</span><span className="text-left font-medium">{meal.sodium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
-                              <span className="text-muted-foreground">بوتاسيوم:</span><span className="text-left font-medium">{meal.potassium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
-                              <span className="text-muted-foreground">كالسيوم:</span><span className="text-left font-medium">{meal.calcium?.toFixed(0) ?? 'غير متاح'} ملغ</span>
-                              <span className="text-muted-foreground">حديد:</span><span className="text-left font-medium">{meal.iron?.toFixed(1) ?? 'غير متاح'} ملغ</span>
-                              <span className="text-muted-foreground">فيتامين أ:</span><span className="text-left font-medium">{meal.vitaminA?.toFixed(0) ?? 'غير متاح'} مكغ</span>
-                              <span className="text-muted-foreground">فيتامين ج:</span><span className="text-left font-medium">{meal.vitaminC?.toFixed(0) ?? 'غير متاح'} ملغ</span>
-                              <span className="text-muted-foreground">فيتامين د:</span><span className="text-left font-medium">{meal.vitaminD?.toFixed(0) ?? 'غير متاح'} ملغ</span>
-                           </div>
+                          <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm">
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.fiber')}:</span><span className="text-left font-medium rtl:text-right">{meal.fiber?.toFixed(1) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.g')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.sugar')}:</span><span className="text-left font-medium rtl:text-right">{meal.sugar?.toFixed(1) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.g')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.sodium')}:</span><span className="text-left font-medium rtl:text-right">{meal.sodium?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.potassium')}:</span><span className="text-left font-medium rtl:text-right">{meal.potassium?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.calcium')}:</span><span className="text-left font-medium rtl:text-right">{meal.calcium?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.iron')}:</span><span className="text-left font-medium rtl:text-right">{meal.iron?.toFixed(1) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminA')}:</span><span className="text-left font-medium rtl:text-right">{meal.vitaminA?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mcg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminC')}:</span><span className="text-left font-medium rtl:text-right">{meal.vitaminC?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mg')}</span>
+                            <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminD')}:</span><span className="text-left font-medium rtl:text-right">{meal.vitaminD?.toFixed(0) ?? t('dashboard.nutrients.not_available')} {t('dashboard.units.mcg')}</span>
+                          </div>
                         </div>
                       </CollapsibleContent>
                     </li>
@@ -271,8 +276,8 @@ export default function DashboardPage() {
               </ul>
             ) : (
               <div className="text-center text-muted-foreground">
-                <p>لم يتم تسجيل أي وجبات بعد.</p>
-                <p>أضف وجبة يدويًا أو حلل صورة للبدء!</p>
+                <p>{t('dashboard.loggedMealsCard.empty')}</p>
+                <p>{t('dashboard.loggedMealsCard.empty_cta')}</p>
               </div>
             )}
           </CardContent>

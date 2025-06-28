@@ -29,33 +29,42 @@ import { Loader2, Sparkles, Utensils } from 'lucide-react';
 import type { SuggestMealsOutput } from '@/ai/flows/suggest-meals';
 import { useDailyLog } from '@/hooks/use-daily-log';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useTranslation } from '@/hooks/use-translation';
 
-const formSchema = z.object({
-  dietaryPreferences: z.string().min(2, {
-    message: 'الرجاء إدخال تفضيلاتك الغذائية.',
-  }),
-  nutrientNeeds: z
-    .string()
-    .min(2, { message: 'الرجاء إدخال احتياجاتك الغذائية.' }),
-  dislikedIngredients: z.string().optional(),
-  numberOfMeals: z.coerce.number().min(1).max(10),
-  useRemainingCalories: z.boolean().default(false),
-});
+const getFormSchema = (t: (key: string) => string) =>
+  z.object({
+    dietaryPreferences: z.string().min(2, {
+      message: t('suggestions.validation.dietaryPreferences'),
+    }),
+    nutrientNeeds: z
+      .string()
+      .min(2, { message: t('suggestions.validation.nutrientNeeds') }),
+    dislikedIngredients: z.string().optional(),
+    numberOfMeals: z.coerce.number().min(1).max(10),
+    useRemainingCalories: z.boolean().default(false),
+  });
 
 export default function SuggestionsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<SuggestMealsOutput | null>(null);
   const { toast } = useToast();
   const { meals, calorieGoal } = useDailyLog();
+  const { t } = useTranslation();
+  
+  React.useEffect(() => {
+    document.title = `${t('suggestions.title')} - NutriSnap`;
+  }, [t]);
 
   const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
   const remainingCalories = Math.max(0, calorieGoal - totalCalories);
+  
+  const formSchema = getFormSchema(t);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dietaryPreferences: 'أي شيء',
-      nutrientNeeds: 'بروتين عالي',
+      dietaryPreferences: t('suggestions.defaults.dietaryPreferences'),
+      nutrientNeeds: t('suggestions.defaults.nutrientNeeds'),
       dislikedIngredients: '',
       numberOfMeals: 3,
       useRemainingCalories: false,
@@ -76,9 +85,8 @@ export default function SuggestionsPage() {
     } catch (error) {
       console.error('Suggestion failed:', error);
       toast({
-        title: 'فشل الاقتراح',
-        description:
-          'تعذر الحصول على اقتراحات الوجبات. يرجى المحاولة مرة أخرى لاحقًا.',
+        title: t('suggestions.toast.error_title'),
+        description: t('suggestions.toast.error_description'),
         variant: 'destructive',
       });
     } finally {
@@ -89,17 +97,17 @@ export default function SuggestionsPage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">اقتراحات وجبات الذكاء الاصطناعي</h1>
-        <p className="text-muted-foreground">
-          محتار ماذا تأكل؟ احصل على أفكار وجبات مخصصة من طاهينا الذكي.
-        </p>
+        <h1 className="font-headline text-4xl font-bold">
+          {t('suggestions.header')}
+        </h1>
+        <p className="text-muted-foreground">{t('suggestions.description')}</p>
       </header>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">تفضيلاتك</CardTitle>
+            <CardTitle className="font-headline">{t('suggestions.preferencesCard.title')}</CardTitle>
             <CardDescription>
-              أخبرنا بما تبحث عنه في الوجبة.
+              {t('suggestions.preferencesCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -113,10 +121,10 @@ export default function SuggestionsPage() {
                   name="dietaryPreferences"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>التفضيلات الغذائية</FormLabel>
+                      <FormLabel>{t('suggestions.form.dietaryPreferences')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="مثال: نباتي، قليل الفودماب"
+                          placeholder={t('suggestions.form.dietaryPreferences_placeholder')}
                           {...field}
                         />
                       </FormControl>
@@ -129,10 +137,10 @@ export default function SuggestionsPage() {
                   name="nutrientNeeds"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>الاحتياجات الغذائية</FormLabel>
+                      <FormLabel>{t('suggestions.form.nutrientNeeds')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="مثال: عالي الألياف، قليل الكربوهيدرات"
+                          placeholder={t('suggestions.form.nutrientNeeds_placeholder')}
                           {...field}
                         />
                       </FormControl>
@@ -145,15 +153,15 @@ export default function SuggestionsPage() {
                   name="dislikedIngredients"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>مكونات غير محببة (اختياري)</FormLabel>
+                      <FormLabel>{t('suggestions.form.dislikedIngredients')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="مثال: كزبرة، فطر"
+                          placeholder={t('suggestions.form.dislikedIngredients_placeholder')}
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
-                        قائمة بالمكونات التي يجب تجنبها مفصولة بفواصل.
+                        {t('suggestions.form.dislikedIngredients_description')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -164,7 +172,7 @@ export default function SuggestionsPage() {
                   name="numberOfMeals"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>عدد الاقتراحات</FormLabel>
+                      <FormLabel>{t('suggestions.form.numberOfSuggestions')}</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} />
                       </FormControl>
@@ -177,7 +185,7 @@ export default function SuggestionsPage() {
                   control={form.control}
                   name="useRemainingCalories"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border bg-muted/20 p-4">
+                    <FormItem className="flex flex-row items-start space-x-3 rtl:space-x-reverse space-y-0 rounded-md border bg-muted/20 p-4">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -187,14 +195,10 @@ export default function SuggestionsPage() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel htmlFor="use-remaining">
-                          بناءً على السعرات الحرارية المتبقية
+                          {t('suggestions.form.useRemainingCalories')}
                         </FormLabel>
                         <FormDescription>
-                          اقترح وجبات تناسب السعرات الحرارية المتبقية{' '}
-                          <span className="font-bold text-primary">
-                            {remainingCalories.toFixed(0)} سعرة حرارية
-                          </span>
-                          .
+                          {t('suggestions.form.useRemainingCalories_description', {calories: remainingCalories.toFixed(0)})}
                         </FormDescription>
                       </div>
                     </FormItem>
@@ -207,7 +211,7 @@ export default function SuggestionsPage() {
                   ) : (
                     <Sparkles className="mr-2 h-4 w-4" />
                   )}
-                  {isLoading ? 'جاري الإنشاء...' : 'الحصول على اقتراحات'}
+                  {isLoading ? t('suggestions.form.button_loading') : t('suggestions.form.button')}
                 </Button>
               </form>
             </Form>
@@ -216,16 +220,16 @@ export default function SuggestionsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">أفكار وجبات</CardTitle>
+            <CardTitle className="font-headline">{t('suggestions.resultsCard.title')}</CardTitle>
             <CardDescription>
-              إليك بعض الاقتراحات من ذكائنا الاصطناعي.
+              {t('suggestions.resultsCard.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading && (
               <div className="flex flex-col items-center justify-center space-y-2 pt-10 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p>جاري تحضير بعض الأفكار...</p>
+                <p>{t('suggestions.resultsCard.loading')}</p>
               </div>
             )}
             {result ? (
@@ -243,7 +247,7 @@ export default function SuggestionsPage() {
             ) : (
               !isLoading && (
                 <div className="flex h-full items-center justify-center text-center text-muted-foreground">
-                  <p>ستظهر اقتراحات وجباتك هنا.</p>
+                  <p>{t('suggestions.resultsCard.placeholder')}</p>
                 </div>
               )
             )}

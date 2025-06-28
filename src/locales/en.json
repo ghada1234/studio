@@ -1,0 +1,166 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "analyze": "Analyze Meal",
+    "add": "Add Meal",
+    "suggestions": "AI Suggestions"
+  },
+  "appShell": {
+    "subtitle": "Nutritional Snap",
+    "userMenu": {
+      "myAccount": "My Account",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Log Out",
+      "language": "Language"
+    }
+  },
+  "dashboard": {
+    "title": "Daily Dashboard",
+    "header": "Daily Dashboard",
+    "description": "Here's your nutritional summary for the day.",
+    "calorieCard": {
+      "title": "Calorie Goal",
+      "description": "Set your daily calorie goal and track your progress.",
+      "placeholder": "e.g. 2000",
+      "button": "Set Goal",
+      "consumed": "Consumed {{consumed}} kcal",
+      "goal": "Goal {{goal}} kcal",
+      "progressLabel": "{{progress}}% of calorie goal"
+    },
+    "macroCard": {
+      "title": "Macronutrients",
+      "description": "Total grams consumed today."
+    },
+    "microCard": {
+      "title": "Micronutrient Summary",
+      "description": "Total micronutrients consumed today."
+    },
+    "loggedMealsCard": {
+      "title": "Logged Meals",
+      "description": "All your meals and snacks for the day. Click to expand.",
+      "empty": "No meals logged yet.",
+      "empty_cta": "Add a meal manually or analyze a photo to get started!",
+      "mealDetails": "{{calories}} kcal • P: {{protein}}g • C: {{carbs}}g • F: {{fat}}g",
+      "toggle": "Toggle"
+    },
+    "nutrients": {
+      "calories": "Calories",
+      "protein": "Protein",
+      "carbs": "Carbohydrates",
+      "fat": "Fat",
+      "fiber": "Fiber",
+      "sugar": "Sugar",
+      "sodium": "Sodium",
+      "potassium": "Potassium",
+      "calcium": "Calcium",
+      "iron": "Iron",
+      "vitaminA": "Vitamin A",
+      "vitaminC": "Vitamin C",
+      "vitaminD": "Vitamin D",
+      "not_available": "N/A"
+    },
+    "units": {
+      "kcal": "kcal",
+      "g": "g",
+      "mg": "mg",
+      "mcg": "mcg"
+    }
+  },
+  "analyze": {
+    "title": "AI Meal Analysis",
+    "header": "AI Meal Analysis",
+    "description": "Upload a picture of your meal and let AI do the hard work.",
+    "uploadCard": {
+      "title": "1. Upload Image",
+      "description": "Choose a clear picture of your meal.",
+      "cta": "Click or drag to upload",
+      "button_loading": "Analyzing...",
+      "button": "Analyze Meal",
+      "error_no_file_title": "No file selected",
+      "error_no_file_description": "Please select an image to analyze."
+    },
+    "reviewCard": {
+      "title": "2. Review Analysis",
+      "description": "Here's the estimated nutritional information.",
+      "loading": "Analyzing image...",
+      "placeholder": "Analysis results will appear here.",
+      "identifiedItems": "Identified Food Items",
+      "estimatedCalories": "Estimated Calories",
+      "estimatedNutrients": "Estimated Nutrients",
+      "add_to_log_button": "Add to Daily Log",
+      "success_toast_title": "Analysis Complete!",
+      "success_toast_description": "The estimated nutritional information is now available.",
+      "error_toast_title": "Analysis Failed",
+      "error_toast_description": "Could not analyze the image. Please try another one.",
+      "log_success_toast_title": "Meal Logged!",
+      "log_success_toast_description": "The analyzed meal has been added to your daily dashboard."
+    },
+     "analyzedMealName": "Analyzed Meal"
+  },
+  "addMeal": {
+    "title": "Add Meal Manually",
+    "header": "Add Meal Manually",
+    "description": "Log a meal by entering its nutritional information below.",
+    "detailsCard": {
+      "title": "Meal Details",
+      "description": "Enter the details of your meal, snack, or recipe."
+    },
+    "form": {
+      "name": "Meal Name",
+      "name_placeholder": "e.g., Grilled Chicken Salad",
+      "macros_title": "Macronutrients",
+      "micros_title": "Micronutrients",
+      "button": "Add Meal to Log"
+    },
+    "validation": {
+      "name_min": "Meal name must be at least 2 characters.",
+      "positive_number": "Must be a positive number."
+    },
+    "toast": {
+      "title": "Meal Added!",
+      "description": "Successfully added {{name}} to your daily log."
+    }
+  },
+  "suggestions": {
+    "title": "AI Meal Suggestions",
+    "header": "AI Meal Suggestions",
+    "description": "Stuck on what to eat? Get personalized meal ideas from our smart chef.",
+    "preferencesCard": {
+      "title": "Your Preferences",
+      "description": "Tell us what you're looking for in a meal."
+    },
+    "form": {
+      "dietaryPreferences": "Dietary Preferences",
+      "dietaryPreferences_placeholder": "e.g. Vegetarian, low-FODMAP",
+      "nutrientNeeds": "Nutrient Needs",
+      "nutrientNeeds_placeholder": "e.g. High fiber, low-carb",
+      "dislikedIngredients": "Disliked Ingredients (optional)",
+      "dislikedIngredients_placeholder": "e.g. cilantro, mushrooms",
+      "dislikedIngredients_description": "Comma-separated list of ingredients to avoid.",
+      "numberOfSuggestions": "Number of Suggestions",
+      "useRemainingCalories": "Base on remaining calories",
+      "useRemainingCalories_description": "Suggest meals that fit into your remaining {{calories}} kcal.",
+      "button_loading": "Generating...",
+      "button": "Get Suggestions"
+    },
+    "validation": {
+      "dietaryPreferences": "Please enter your dietary preferences.",
+      "nutrientNeeds": "Please enter your nutrient needs."
+    },
+    "resultsCard": {
+      "title": "Meal Ideas",
+      "description": "Here are some suggestions from our AI.",
+      "loading": "Whipping up some ideas...",
+      "placeholder": "Your meal suggestions will appear here."
+    },
+    "toast": {
+      "error_title": "Suggestion Failed",
+      "error_description": "Could not get meal suggestions. Please try again later."
+    },
+    "defaults": {
+      "dietaryPreferences": "Anything",
+      "nutrientNeeds": "High protein"
+    }
+  }
+}

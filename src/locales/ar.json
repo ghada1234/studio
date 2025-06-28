@@ -1,0 +1,166 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "analyze": "تحليل وجبة",
+    "add": "إضافة وجبة",
+    "suggestions": "اقتراحات الذكاء الاصطناعي"
+  },
+  "appShell": {
+    "subtitle": "لقطة غذائية",
+    "userMenu": {
+      "myAccount": "حسابي",
+      "profile": "الملف الشخصي",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج",
+      "language": "اللغة"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم اليومية",
+    "header": "لوحة التحكم اليومية",
+    "description": "إليك ملخصك الغذائي لهذا اليوم.",
+    "calorieCard": {
+      "title": "هدف السعرات الحرارية",
+      "description": "حدد هدفك اليومي من السعرات الحرارية وتتبع تقدمك.",
+      "placeholder": "مثال: 2000",
+      "button": "تحديد الهدف",
+      "consumed": "استهلكت {{consumed}} سعرة حرارية",
+      "goal": "الهدف {{goal}} سعرة حرارية",
+      "progressLabel": "{{progress}}% من هدف السعرات الحرارية"
+    },
+    "macroCard": {
+      "title": "المغذيات الكبرى",
+      "description": "إجمالي الجرامات المستهلكة اليوم."
+    },
+    "microCard": {
+      "title": "ملخص المغذيات الدقيقة",
+      "description": "إجمالي المغذيات الدقيقة المستهلكة اليوم."
+    },
+    "loggedMealsCard": {
+      "title": "الوجبات المسجلة",
+      "description": "جميع وجباتك ووجباتك الخفيفة لهذا اليوم. انقر للتوسيع.",
+      "empty": "لم يتم تسجيل أي وجبات بعد.",
+      "empty_cta": "أضف وجبة يدويًا أو حلل صورة للبدء!",
+      "mealDetails": "{{calories}} سعرة حرارية • ب: {{protein}}غ • ك: {{carbs}}غ • د: {{fat}}غ",
+      "toggle": "تبديل"
+    },
+    "nutrients": {
+      "calories": "السعرات الحرارية",
+      "protein": "بروتين",
+      "carbs": "كربوهيدرات",
+      "fat": "دهون",
+      "fiber": "ألياف",
+      "sugar": "سكر",
+      "sodium": "صوديوم",
+      "potassium": "بوتاسيوم",
+      "calcium": "كالسيوم",
+      "iron": "حديد",
+      "vitaminA": "فيتامين أ",
+      "vitaminC": "فيتامين ج",
+      "vitaminD": "فيتامين د",
+      "not_available": "غير متاح"
+    },
+    "units": {
+      "kcal": "سعرة حرارية",
+      "g": "غ",
+      "mg": "ملغ",
+      "mcg": "مكغ"
+    }
+  },
+  "analyze": {
+    "title": "تحليل الوجبة بالذكاء الاصطناعي",
+    "header": "تحليل الوجبة بالذكاء الاصطناعي",
+    "description": "حمّل صورة لوجبتك ودع الذكاء الاصطناعي يقوم بالعمل الشاق.",
+    "uploadCard": {
+      "title": "1. تحميل الصورة",
+      "description": "اختر صورة واضحة لوجبتك.",
+      "cta": "انقر أو اسحب للتحميل",
+      "button_loading": "يتم التحليل...",
+      "button": "تحليل الوجبة",
+      "error_no_file_title": "لم يتم تحديد أي ملف",
+      "error_no_file_description": "الرجاء اختيار صورة لتحليلها."
+    },
+    "reviewCard": {
+      "title": "2. مراجعة التحليل",
+      "description": "إليك المعلومات الغذائية التقديرية.",
+      "loading": "جاري تحليل الصورة...",
+      "placeholder": "ستظهر نتائج التحليل هنا.",
+      "identifiedItems": "العناصر الغذائية المحددة",
+      "estimatedCalories": "السعرات الحرارية التقديرية",
+      "estimatedNutrients": "العناصر الغذائية التقديرية",
+      "add_to_log_button": "إضافة إلى السجل اليومي",
+      "success_toast_title": "اكتمل التحليل!",
+      "success_toast_description": "المعلومات الغذائية التقديرية متاحة الآن.",
+      "error_toast_title": "فشل التحليل",
+      "error_toast_description": "تعذر تحليل الصورة. يرجى تجربة صورة أخرى.",
+      "log_success_toast_title": "تم تسجيل الوجبة!",
+      "log_success_toast_description": "تمت إضافة الوجبة التي تم تحليلها إلى لوحة التحكم اليومية الخاصة بك."
+    },
+    "analyzedMealName": "وجبة تم تحليلها"
+  },
+  "addMeal": {
+    "title": "إضافة وجبة يدوياً",
+    "header": "إضافة وجبة يدوياً",
+    "description": "سجل وجبة عن طريق إدخال معلوماتها الغذائية أدناه.",
+    "detailsCard": {
+      "title": "تفاصيل الوجبة",
+      "description": "أدخل تفاصيل وجبتك أو وجبتك الخفيفة أو وصفتك."
+    },
+    "form": {
+      "name": "اسم الوجبة",
+      "name_placeholder": "مثال: سلطة دجاج مشوي",
+      "macros_title": "المغذيات الكبرى",
+      "micros_title": "المغذيات الدقيقة",
+      "button": "إضافة وجبة إلى السجل"
+    },
+    "validation": {
+      "name_min": "يجب أن يتكون اسم الوجبة من حرفين على الأقل.",
+      "positive_number": "يجب أن تكون القيمة موجبة."
+    },
+    "toast": {
+      "title": "تمت إضافة الوجبة!",
+      "description": "تمت إضافة {{name}} إلى سجلك اليومي."
+    }
+  },
+  "suggestions": {
+    "title": "اقتراحات وجبات الذكاء الاصطناعي",
+    "header": "اقتراحات وجبات الذكاء الاصطناعي",
+    "description": "محتار ماذا تأكل؟ احصل على أفكار وجبات مخصصة من طاهينا الذكي.",
+    "preferencesCard": {
+      "title": "تفضيلاتك",
+      "description": "أخبرنا بما تبحث عنه في الوجبة."
+    },
+    "form": {
+      "dietaryPreferences": "التفضيلات الغذائية",
+      "dietaryPreferences_placeholder": "مثال: نباتي، قليل الفودماب",
+      "nutrientNeeds": "الاحتياجات الغذائية",
+      "nutrientNeeds_placeholder": "مثال: عالي الألياف، قليل الكربوهيدرات",
+      "dislikedIngredients": "مكونات غير محببة (اختياري)",
+      "dislikedIngredients_placeholder": "مثال: كزبرة، فطر",
+      "dislikedIngredients_description": "قائمة بالمكونات التي يجب تجنبها مفصولة بفواصل.",
+      "numberOfSuggestions": "عدد الاقتراحات",
+      "useRemainingCalories": "بناءً على السعرات الحرارية المتبقية",
+      "useRemainingCalories_description": "اقترح وجبات تناسب السعرات الحرارية المتبقية {{calories}} سعرة حرارية.",
+      "button_loading": "جاري الإنشاء...",
+      "button": "الحصول على اقتراحات"
+    },
+    "validation": {
+      "dietaryPreferences": "الرجاء إدخال تفضيلاتك الغذائية.",
+      "nutrientNeeds": "الرجاء إدخال احتياجاتك الغذائية."
+    },
+    "resultsCard": {
+      "title": "أفكار وجبات",
+      "description": "إليك بعض الاقتراحات من ذكائنا الاصطناعي.",
+      "loading": "جاري تحضير بعض الأفكار...",
+      "placeholder": "ستظهر اقتراحات وجباتك هنا."
+    },
+    "toast": {
+      "error_title": "فشل الاقتراح",
+      "error_description": "تعذر الحصول على اقتراحات الوجبات. يرجى المحاولة مرة أخرى لاحقًا."
+    },
+    "defaults": {
+      "dietaryPreferences": "أي شيء",
+      "nutrientNeeds": "بروتين عالي"
+    }
+  }
+}
