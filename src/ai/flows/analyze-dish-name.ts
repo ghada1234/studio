@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -37,21 +38,39 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are an expert nutritionist. Your task is to analyze the following dish name and provide nutritional information in JSON format.
+  prompt: `You are an expert nutritionist API. Your only function is to analyze a dish name and return a JSON object with nutritional information.
 
-Dish Name: {{{dishName}}}
+**Input Dish Name:**
+{{{dishName}}}
+
 {{#if portionSize}}
-Portion Size: {{{portionSize}}}
+**User-provided Portion Size:**
+{{{portionSize}}}
 {{/if}}
 
-Instructions:
-1.  Identify the main ingredients for the given dish.
-2.  Estimate the total calories for the portion size provided. If no portion size is given, assume a standard single serving.
-3.  Estimate the macronutrients (protein, carbohydrates, fat, fiber, sugar) in grams.
-4.  Estimate key micronutrients (sodium, potassium, calcium, iron, Vitamin A, Vitamin C, Vitamin D) in their standard units (mg or mcg).
-5.  If you cannot confidently identify the dish, make a reasonable guess based on the words. For example, for "spicy chicken fun", you might assume it's a spicy chicken stir-fry.
-6.  If the input is clearly not a food item (e.g., "a table"), return an empty list for 'foodItems' and 0 for all nutrient values.
-7.  Return ONLY the JSON object that matches the output schema. Do not add any extra text, commentary, or markdown formatting like \`json\` before the object.
+**Your Task:**
+1.  Analyze the dish name to identify its ingredients.
+2.  Estimate the nutritional content for the dish. If a portion size is provided, base your estimates on that. Otherwise, assume a standard single serving.
+3.  If the input is not a food item, you MUST return a JSON object with "foodItems": [] and all other numeric values set to 0.
+4.  **You MUST respond with ONLY a valid JSON object** that strictly adheres to the following structure. Do not include any introductory text, explanations, or markdown formatting.
+
+**JSON Output Structure:**
+{
+  "foodItems": ["string"],
+  "estimatedCalories": "number (optional)",
+  "protein": "number (optional, in grams)",
+  "carbs": "number (optional, in grams)",
+  "fat": "number (optional, in grams)",
+  "fiber": "number (optional, in grams)",
+  "sugar": "number (optional, in grams)",
+  "sodium": "number (optional, in mg)",
+  "potassium": "number (optional, in mg)",
+  "calcium": "number (optional, in mg)",
+  "iron": "number (optional, in mg)",
+  "vitaminA": "number (optional, in mcg RAE)",
+  "vitaminC": "number (optional, in mg)",
+  "vitaminD": "number (optional, in mcg)"
+}
 `,
   config: {
     safetySettings: [
@@ -89,3 +108,4 @@ const analyzeDishNameFlow = ai.defineFlow(
     return output;
   }
 );
+
