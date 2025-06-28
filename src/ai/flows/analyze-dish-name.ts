@@ -37,22 +37,42 @@ const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are a nutritional expert with a vast knowledge of international cuisine, including dishes from all over the world such as the Middle East (Iraq, Lebanon, Syria, Yemen, UAE, etc.), Asia, Europe, Africa, and the Americas. Analyze the dish name provided: {{{dishName}}}.
+  prompt: `You are an expert nutritionist. Your task is to analyze the following dish name and provide nutritional information in JSON format.
 
+Dish Name: {{{dishName}}}
 {{#if portionSize}}
-The user has specified a portion size of: {{{portionSize}}}. Please adjust the nutritional information accordingly.
-{{else}}
-Assume a standard, single serving portion size.
+Portion Size: {{{portionSize}}}
 {{/if}}
 
-Based on the specified or a standard preparation of this dish, provide an estimation of the total calories and the following nutrients:
-- Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
-- Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
-
-For the 'foodItems' field, list the typical ingredients for this dish. If you cannot identify the dish, make a best-effort guess based on the words in the name and set the 'foodItems' to reflect your guess.
-
-Return the data in the specified JSON format.
+Instructions:
+1.  Identify the main ingredients for the given dish.
+2.  Estimate the total calories for the portion size provided. If no portion size is given, assume a standard single serving.
+3.  Estimate the macronutrients (protein, carbohydrates, fat, fiber, sugar) in grams.
+4.  Estimate key micronutrients (sodium, potassium, calcium, iron, Vitamin A, Vitamin C, Vitamin D) in their standard units (mg or mcg).
+5.  If you cannot confidently identify the dish, make a reasonable guess based on the words. For example, for "spicy chicken fun", you might assume it's a spicy chicken stir-fry.
+6.  If the input is clearly not a food item (e.g., "a table"), return an empty list for 'foodItems' and 0 for all nutrient values.
+7.  Return ONLY the JSON object that matches the output schema. Do not add any extra text, commentary, or markdown formatting like \`json\` before the object.
 `,
+  config: {
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE',
+      },
+    ],
+  },
 });
 
 const analyzeDishNameFlow = ai.defineFlow(

@@ -40,25 +40,43 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: FoodAnalysisOutputSchema},
-  prompt: `You are a nutritional expert. Analyze the food image provided.
+  prompt: `You are an expert nutritionist. Your task is to analyze the provided food image and return nutritional information in JSON format.
 
-Photo: {{media url=photoDataUri}}
-
-Identify the food items in the image. If you cannot identify a food item, state that it is an "unidentified food item".
+Image: {{media url=photoDataUri}}
 
 {{#if portionSize}}
-The user has specified a portion size of: {{{portionSize}}}. Please adjust the nutritional information to match this portion size.
-{{else}}
-Visually estimate the portion size from the image, using common objects for scale if visible (like a fork or a hand), and base your nutritional analysis on that estimation. If no scale is available, assume a standard, single serving portion.
+The user has specified a portion size of: {{{portionSize}}}.
 {{/if}}
 
-Provide an estimation of the total calories.
-Provide an estimation for the following nutrients:
-- Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
-- Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
-
-Return the data in the specified JSON format. If the image does not contain food, return an empty list for 'foodItems' and 0 for all nutrient values.
+Instructions:
+1.  Identify all food items in the image.
+2.  Estimate the portion size from the image, unless a portion size is provided by the user.
+3.  Based on the identified items and portion size, estimate the total calories.
+4.  Estimate macronutrients (protein, carbs, fat, fiber, sugar) in grams.
+5.  Estimate key micronutrients (sodium, potassium, calcium, iron, Vitamin A, Vitamin C, Vitamin D) in standard units (mg or mcg).
+6.  If the image does not appear to contain food, you MUST return a JSON object with an empty 'foodItems' array and 0 for all nutrient values.
+7.  Return ONLY the JSON object that matches the output schema. Do not add any extra text, commentary, or markdown formatting like \`json\` before the object.
 `,
+  config: {
+    safetySettings: [
+      {
+        category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HATE_SPEECH',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_HARASSMENT',
+        threshold: 'BLOCK_NONE',
+      },
+      {
+        category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+        threshold: 'BLOCK_NONE',
+      },
+    ],
+  },
 });
 
 const analyzeFoodImageFlow = ai.defineFlow(
