@@ -2,12 +2,14 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import {
   BrainCircuit,
   Camera,
   Globe,
   LayoutDashboard,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 
 import {
@@ -37,11 +39,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from '@/hooks/use-translation';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const { t, setLanguage } = useTranslation();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push('/login');
+  };
 
   const navItems = [
     {
@@ -120,54 +130,71 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <Button asChild variant="outline" size="sm">
-                <Link href="/register">{t('nav.register')}</Link>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>
+                        {user.email?.charAt(0).toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <p>{t('appShell.userMenu.myAccount')}</p>
+                    <p className="text-xs font-normal text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <UserIcon />
+                      <span>{t('appShell.userMenu.profile')}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    {t('appShell.userMenu.settings')}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <Globe />
+                      <span>{t('appShell.userMenu.language')}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent>
+                        <DropdownMenuItem onClick={() => setLanguage('en')}>
+                          English
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                          العربية
+                        </DropdownMenuItem>
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut />
+                    <span>{t('appShell.userMenu.logout')}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/login">{t('nav.login')}</Link>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  {t('appShell.userMenu.myAccount')}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  {t('appShell.userMenu.profile')}
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  {t('appShell.userMenu.settings')}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>
-                    <Globe />
-                    <span>{t('appShell.userMenu.language')}</span>
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuPortal>
-                    <DropdownMenuSubContent>
-                      <DropdownMenuItem onClick={() => setLanguage('en')}>
-                        English
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                        العربية
-                      </DropdownMenuItem>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuPortal>
-                </DropdownMenuSub>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  {t('appShell.userMenu.logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <Button asChild variant="default" size="sm">
+                  <Link href="/register">{t('nav.register')}</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </header>
         {children}

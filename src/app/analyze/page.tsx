@@ -24,6 +24,8 @@ import { Loader2, UploadCloud, Search } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -36,12 +38,25 @@ export default function AnalyzePage() {
   const { toast } = useToast();
   const { addMeal } = useDailyLog();
   const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   const isLoading = loadingSource !== 'idle';
 
   React.useEffect(() => {
     document.title = `${t('analyze.title')} - NutriSnap`;
-  }, [t]);
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router, t]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];

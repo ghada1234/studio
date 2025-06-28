@@ -3,7 +3,8 @@
     "dashboard": "لوحة التحكم",
     "analyze": "تحليل وجبة",
     "suggestions": "اقتراحات الذكاء الاصطناعي",
-    "register": "تسجيل"
+    "register": "تسجيل",
+    "login": "تسجيل الدخول"
   },
   "appShell": {
     "subtitle": "لقطة غذائية",
@@ -155,6 +156,31 @@
       "nutrientNeeds": "بروتين عالي"
     }
   },
+  "login": {
+    "title": "تسجيل الدخول",
+    "card": {
+      "title": "تسجيل الدخول إلى حسابك",
+      "description": "مرحبا بعودتك! الرجاء إدخال بياناتك.",
+      "footer_text": "ليس لديك حساب؟",
+      "footer_link": "تسجيل"
+    },
+    "form": {
+      "email": "البريد الإلكتروني",
+      "email_placeholder": "مثال: user@example.com",
+      "password": "كلمة المرور",
+      "button": "تسجيل الدخول"
+    },
+    "validation": {
+      "email": "الرجاء إدخال بريد إلكتروني صالح.",
+      "password": "كلمة المرور مطلوبة."
+    },
+    "toast": {
+      "success_title": "تم تسجيل الدخول بنجاح!",
+      "success_description": "مرحبًا بك مرة أخرى في NutriSnap!",
+      "error_title": "فشل تسجيل الدخول",
+      "error_description": "بيانات الاعتماد غير صالحة. الرجاء المحاولة مرة أخرى."
+    }
+  },
   "register": {
     "title": "إنشاء حساب",
     "card": {
@@ -162,8 +188,6 @@
       "description": "املأ النموذج أدناه للانضمام إلى NutriSnap."
     },
     "form": {
-      "name": "الاسم الكامل",
-      "name_placeholder": "مثال: جون دو",
       "email": "البريد الإلكتروني",
       "email_placeholder": "مثال: user@example.com",
       "password": "كلمة المرور",
@@ -171,14 +195,34 @@
       "button": "تسجيل"
     },
     "validation": {
-      "name": "الاسم مطلوب.",
       "email": "الرجاء إدخال بريد إلكتروني صالح.",
       "password": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
       "confirmPassword": "كلمتا المرور غير متطابقتين."
     },
     "toast": {
       "success_title": "تم التسجيل بنجاح!",
-      "success_description": "تم إنشاء حسابك. مرحبًا بك في NutriSnap!"
+      "success_description": "تم إنشاء حسابك. مرحبًا بك في NutriSnap!",
+      "error_title": "فشل التسجيل",
+      "error_description_generic": "حدث خطأ ما. الرجاء المحاولة مرة أخرى.",
+      "error_email_in_use": "هذا البريد الإلكتروني مسجل بالفعل."
+    }
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "card": {
+      "title": "الملف الشخصي للمستخدم",
+      "description": "هذه هي معلومات حسابك."
+    },
+    "form": {
+      "email": "عنوان البريد الإلكتروني",
+      "uid": "معرف المستخدم",
+      "logout_button": "تسجيل الخروج"
+    },
+    "toast": {
+      "logout_success_title": "تم تسجيل الخروج",
+      "logout_success_description": "لقد تم تسجيل خروجك بنجاح.",
+      "logout_error_title": "فشل تسجيل الخروج",
+      "logout_error_description": "حدث خطأ أثناء تسجيل الخروج."
     }
   }
 }

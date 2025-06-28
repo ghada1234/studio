@@ -3,7 +3,8 @@
     "dashboard": "Dashboard",
     "analyze": "Analyze Meal",
     "suggestions": "AI Suggestions",
-    "register": "Register"
+    "register": "Register",
+    "login": "Login"
   },
   "appShell": {
     "subtitle": "Nutritional Snap",
@@ -155,6 +156,31 @@
       "nutrientNeeds": "High protein"
     }
   },
+  "login": {
+    "title": "Login",
+    "card": {
+      "title": "Login to your Account",
+      "description": "Welcome back! Please enter your details.",
+      "footer_text": "Don't have an account?",
+      "footer_link": "Register"
+    },
+    "form": {
+      "email": "Email",
+      "email_placeholder": "e.g. user@example.com",
+      "password": "Password",
+      "button": "Login"
+    },
+    "validation": {
+      "email": "Please enter a valid email.",
+      "password": "Password is required."
+    },
+    "toast": {
+      "success_title": "Login Successful!",
+      "success_description": "Welcome back to NutriSnap!",
+      "error_title": "Login Failed",
+      "error_description": "Invalid credentials. Please try again."
+    }
+  },
   "register": {
     "title": "Create Account",
     "card": {
@@ -162,8 +188,6 @@
       "description": "Fill out the form below to join NutriSnap."
     },
     "form": {
-      "name": "Full Name",
-      "name_placeholder": "e.g. John Doe",
       "email": "Email",
       "email_placeholder": "e.g. user@example.com",
       "password": "Password",
@@ -171,14 +195,34 @@
       "button": "Register"
     },
     "validation": {
-      "name": "Name is required.",
       "email": "Please enter a valid email.",
       "password": "Password must be at least 8 characters.",
       "confirmPassword": "Passwords do not match."
     },
     "toast": {
       "success_title": "Registered successfully!",
-      "success_description": "Your account has been created. Welcome to NutriSnap!"
+      "success_description": "Your account has been created. Welcome to NutriSnap!",
+      "error_title": "Registration Failed",
+      "error_description_generic": "Something went wrong. Please try again.",
+      "error_email_in_use": "This email is already registered."
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "card": {
+      "title": "User Profile",
+      "description": "Here is your account information."
+    },
+    "form": {
+      "email": "Email Address",
+      "uid": "User ID",
+      "logout_button": "Logout"
+    },
+    "toast": {
+      "logout_success_title": "Logged Out",
+      "logout_success_description": "You have been successfully logged out.",
+      "logout_error_title": "Logout Failed",
+      "logout_error_description": "An error occurred while logging out."
     }
   }
 }

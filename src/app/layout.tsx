@@ -4,6 +4,7 @@ import { AppShell } from '@/components/layout/app-shell';
 import { DailyLogProvider } from '@/hooks/use-daily-log';
 import { Toaster } from '@/components/ui/toaster';
 import { TranslationProvider } from '@/hooks/use-translation';
+import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
   title: 'NutriSnap',
@@ -32,10 +33,12 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <TranslationProvider>
-          <DailyLogProvider>
-            <AppShell>{children}</AppShell>
-            <Toaster />
-          </DailyLogProvider>
+          <AuthProvider>
+            <DailyLogProvider>
+              <AppShell>{children}</AppShell>
+              <Toaster />
+            </DailyLogProvider>
+          </AuthProvider>
         </TranslationProvider>
       </body>
     </html>

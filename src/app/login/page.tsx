@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +23,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
@@ -29,28 +31,22 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Loader2 } from 'lucide-react';
 
 const getFormSchema = (t: (key: string) => string) =>
-  z
-    .object({
-      email: z.string().email({ message: t('register.validation.email') }),
-      password: z
-        .string()
-        .min(8, { message: t('register.validation.password') }),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t('register.validation.confirmPassword'),
-      path: ['confirmPassword'],
-    });
+  z.object({
+    email: z.string().email({ message: t('login.validation.email') }),
+    password: z
+      .string()
+      .min(1, { message: t('login.validation.password') }),
+  });
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const router = useRouter();
-  const { signup } = useAuth();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
-    document.title = `${t('register.title')} - NutriSnap`;
+    document.title = `${t('login.title')} - NutriSnap`;
   }, [t]);
 
   const formSchema = getFormSchema(t);
@@ -60,28 +56,23 @@ export default function RegisterPage() {
     defaultValues: {
       email: '',
       password: '',
-      confirmPassword: '',
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signup(values.email, values.password);
+      await login(values.email, values.password);
       toast({
-        title: t('register.toast.success_title'),
-        description: t('register.toast.success_description'),
+        title: t('login.toast.success_title'),
+        description: t('login.toast.success_description'),
       });
       router.push('/');
     } catch (error: any) {
-      console.error('Registration failed:', error);
-      let errorMessage = t('register.toast.error_description_generic');
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = t('register.toast.error_email_in_use');
-      }
+      console.error('Login failed:', error);
       toast({
-        title: t('register.toast.error_title'),
-        description: errorMessage,
+        title: t('login.toast.error_title'),
+        description: t('login.toast.error_description'),
         variant: 'destructive',
       });
     } finally {
@@ -94,9 +85,9 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
-            {t('register.card.title')}
+            {t('login.card.title')}
           </CardTitle>
-          <CardDescription>{t('register.card.description')}</CardDescription>
+          <CardDescription>{t('login.card.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -106,11 +97,11 @@ export default function RegisterPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('register.form.email')}</FormLabel>
+                    <FormLabel>{t('login.form.email')}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder={t('register.form.email_placeholder')}
+                        placeholder={t('login.form.email_placeholder')}
                         {...field}
                       />
                     </FormControl>
@@ -123,20 +114,7 @@ export default function RegisterPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('register.form.password')}</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('register.form.confirmPassword')}</FormLabel>
+                    <FormLabel>{t('login.form.password')}</FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -148,11 +126,19 @@ export default function RegisterPage() {
                 {isLoading && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {t('register.form.button')}
+                {t('login.form.button')}
               </Button>
             </form>
           </Form>
         </CardContent>
+        <CardFooter className="flex justify-center text-sm">
+          <p className="text-muted-foreground">
+            {t('login.card.footer_text')}{' '}
+            <Link href="/register" className="font-medium text-primary hover:underline">
+              {t('login.card.footer_link')}
+            </Link>
+          </p>
+        </CardFooter>
       </Card>
     </div>
   );

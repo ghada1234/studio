@@ -25,17 +25,32 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, Loader2 } from 'lucide-react';
 import { useTranslation } from '@/hooks/use-translation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function DashboardPage() {
   const { meals, calorieGoal, setCalorieGoal } = useDailyLog();
   const [goalInput, setGoalInput] = React.useState(calorieGoal.toString());
   const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
 
   React.useEffect(() => {
     document.title = `${t('dashboard.title')} - NutriSnap`;
-  }, [t]);
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router, t]);
+
+  if (authLoading || !user) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const chartConfig = {
     calories: {

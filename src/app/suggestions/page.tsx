@@ -30,6 +30,8 @@ import type { SuggestMealsOutput } from '@/ai/flows/suggest-meals';
 import { useDailyLog } from '@/hooks/use-daily-log';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useTranslation } from '@/hooks/use-translation';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 const getFormSchema = (t: (key: string) => string) =>
   z.object({
@@ -50,10 +52,15 @@ export default function SuggestionsPage() {
   const { toast } = useToast();
   const { meals, calorieGoal } = useDailyLog();
   const { t } = useTranslation();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   
   React.useEffect(() => {
     document.title = `${t('suggestions.title')} - NutriSnap`;
-  }, [t]);
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router, t]);
 
   const totalCalories = meals.reduce((sum, meal) => sum + meal.calories, 0);
   const remainingCalories = Math.max(0, calorieGoal - totalCalories);
@@ -70,6 +77,14 @@ export default function SuggestionsPage() {
       useRemainingCalories: false,
     },
   });
+  
+  if (authLoading || !user) {
+    return (
+      <div className="flex h-[calc(100vh-3.5rem)] w-full items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
