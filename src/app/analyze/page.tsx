@@ -318,7 +318,7 @@ export default function AnalyzePage() {
                   <h3 className="font-semibold">
                     {t('analyze.reviewCard.estimatedNutrients')}
                   </h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                  <div className="grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
                     <span className="text-muted-foreground">
                       {t('dashboard.nutrients.protein')}:
                     </span>
