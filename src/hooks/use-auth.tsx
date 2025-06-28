@@ -90,19 +90,14 @@ const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+// Real Provider for when Firebase is configured
+const RealAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // If firebase isn't configured, we don't need to do anything here.
-    // The component will render the MockAuthProvider.
-    if (!firebaseAuth) {
-      setLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+    // We know firebaseAuth is not null here because AuthProvider directs to us.
+    const unsubscribe = onAuthStateChanged(firebaseAuth!, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -115,15 +110,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user,
       loading,
       login: (email, password) => {
-        if (!firebaseAuth) throw new Error('Firebase not configured.');
+        if (!firebaseAuth) throw new Error('Firebase not configured.'); // Should not happen
         return signInWithEmailAndPassword(firebaseAuth, email, password);
       },
       signup: (email, password) => {
-        if (!firebaseAuth) throw new Error('Firebase not configured.');
+        if (!firebaseAuth) throw new Error('Firebase not configured.'); // Should not happen
         return createUserWithEmailAndPassword(firebaseAuth, email, password);
       },
       logout: () => {
-        if (!firebaseAuth) throw new Error('Firebase not configured.');
+        if (!firebaseAuth) throw new Error('Firebase not configured.'); // Should not happen
         return signOut(firebaseAuth);
       },
     }),
@@ -138,15 +133,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If Firebase is not configured, render the MockAuthProvider.
-  // This provides a fake authenticated user, allowing the rest of the app to render.
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+// Main AuthProvider that switches between Mock and Real providers
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   if (!firebaseAuth) {
     return <MockAuthProvider>{children}</MockAuthProvider>;
   }
 
-  // Otherwise, render the real provider with real Firebase auth state.
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <RealAuthProvider>{children}</RealAuthProvider>;
 }
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
