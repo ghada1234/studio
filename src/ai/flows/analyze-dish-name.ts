@@ -46,6 +46,23 @@ const prompt = ai.definePrompt({
 3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
 4.  If the input is not a recognizable food item, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
 
+**EXAMPLE:**
+Input:
+- Name: "2 large eggs with toast"
+- Portion Size: "2 slices"
+
+Expected Output:
+\`\`\`json
+{
+  "foodItems": ["eggs", "toast"],
+  "estimatedCalories": 300,
+  "protein": 18,
+  "carbs": 28,
+  "fat": 15,
+  "sugar": 2
+}
+\`\`\`
+
 **Dish to Analyze:**
 - Name: {{{dishName}}}
 {{#if portionSize}}

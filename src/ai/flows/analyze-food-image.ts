@@ -49,6 +49,24 @@ const prompt = ai.definePrompt({
 3.  For any nutritional value that cannot be estimated, COMPLETELY OMIT its key from the JSON object. Do not use \`null\` or \`0\` as placeholders.
 4.  If the image does not appear to contain food, return a JSON object where "foodItems" is an empty array (\`[]\`) and all other fields are omitted.
 
+**EXAMPLE (for an image of a bowl of oatmeal with berries):**
+Input:
+- Image: [Image data]
+- Portion Size: "1 bowl"
+
+Expected Output:
+\`\`\`json
+{
+  "foodItems": ["oatmeal", "blueberries", "strawberries"],
+  "estimatedCalories": 250,
+  "protein": 6,
+  "carbs": 50,
+  "fat": 4,
+  "fiber": 8,
+  "sugar": 15
+}
+\`\`\`
+
 **Image to Analyze:**
 {{media url=photoDataUri}}
 {{#if portionSize}}
