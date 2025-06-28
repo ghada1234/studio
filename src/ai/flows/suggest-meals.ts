@@ -45,23 +45,28 @@ const prompt = ai.definePrompt({
   name: 'suggestMealsPrompt',
   input: {schema: SuggestMealsInputSchema},
   output: {schema: SuggestMealsOutputSchema},
-  prompt: `You are a nutritional expert, skilled at suggesting meals
-  based on a user's dietary restrictions and nutrient needs.
+  prompt: `You are a nutritional expert, skilled at suggesting meals based on a user's dietary restrictions and nutrient needs.
 
-  Given the following dietary preferences: {{{dietaryPreferences}}}
-  And the following nutrient needs: {{{nutrientNeeds}}}
-  And disliked ingredients: {{{dislikedIngredients}}}
-  {{#if remainingCalories}}
-  And a remaining calorie budget of {{{remainingCalories}}} kcal for all suggested meals combined.
-  {{/if}}
+**CRITICAL INSTRUCTIONS:**
+1. You MUST output a single, valid JSON object and nothing else. Do not add explanations or markdown formatting. The JSON object must conform to the provided JSON schema.
+2. If you cannot generate suggestions for any reason, return a JSON object with an empty "meals" array: \`{"meals": []}\`.
 
-  Suggest {{{numberOfMeals}}} meals that satisfy these requirements.
-  {{#if remainingCalories}}
-  Make sure the total calories of all suggested meals do not exceed {{{remainingCalories}}} kcal.
-  Also include the estimated calories for each meal suggestion. For example: "Grilled Salmon with Asparagus (~450 calories)".
-  {{/if}}
+**User's Requirements:**
+- Dietary Preferences: {{{dietaryPreferences}}}
+- Nutrient Needs: {{{nutrientNeeds}}}
+{{#if dislikedIngredients}}
+- Disliked Ingredients: {{{dislikedIngredients}}}
+{{/if}}
+{{#if remainingCalories}}
+- Remaining Calorie Budget: {{{remainingCalories}}} kcal for all suggested meals combined.
+{{/if}}
 
-  Return the list of meals as a JSON array of strings.
+**Task:**
+- Suggest exactly {{{numberOfMeals}}} meals that satisfy these requirements.
+{{#if remainingCalories}}
+- The total calories of all suggested meals MUST NOT exceed the remaining calorie budget.
+- Each meal suggestion MUST include an estimated calorie count. For example: "Grilled Salmon with Asparagus (~450 calories)".
+{{/if}}
   `,
 });
 
@@ -71,8 +76,12 @@ const suggestMealsFlow = ai.defineFlow(
     inputSchema: SuggestMealsInputSchema,
     outputSchema: SuggestMealsOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      // Return an empty list of meals if the model fails.
+      return {meals: []};
+    }
+    return output;
   }
 );
