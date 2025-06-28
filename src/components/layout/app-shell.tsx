@@ -8,6 +8,7 @@ import {
   Camera,
   Globe,
   LayoutDashboard,
+  UserPlus,
 } from 'lucide-react';
 
 import {
@@ -59,6 +60,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       icon: BrainCircuit,
       label: t('nav.suggestions'),
     },
+    {
+      href: '/register',
+      icon: UserPlus,
+      label: t('nav.register'),
+    },
   ];
 
   return (
@@ -102,13 +108,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
+      </Sidebar>
 
-        <SidebarHeader className="mt-auto border-t border-sidebar-border p-3">
+      <SidebarInset>
+        <header
+          className={cn(
+            'sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6'
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="md:hidden" />
+            <Link href="/" className="flex items-center gap-2 md:hidden">
+              <NutriSnapLogo className="h-6 w-6 text-primary" />
+              <span className="font-headline text-lg font-semibold leading-tight">
+                NutriSnap
+              </span>
+            </Link>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="flex w-full items-center justify-start gap-3 p-2 hover:bg-sidebar-accent"
+                className="relative h-8 w-8 rounded-full"
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
@@ -118,21 +139,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
-                <div className="text-left group-data-[collapsible=icon]:hidden">
-                  <p className="text-sm font-medium">User</p>
-                  <p className="text-xs text-muted-foreground">
-                    user@nutrisnap.app
-                  </p>
-                </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="left" align="start">
-              <DropdownMenuLabel>{t('appShell.userMenu.myAccount')}</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                {t('appShell.userMenu.myAccount')}
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>{t('appShell.userMenu.profile')}</DropdownMenuItem>
-              <DropdownMenuItem>{t('appShell.userMenu.settings')}</DropdownMenuItem>
+              <DropdownMenuItem>
+                {t('appShell.userMenu.profile')}
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                {t('appShell.userMenu.settings')}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-               <DropdownMenuSub>
+              <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Globe />
                   <span>{t('appShell.userMenu.language')}</span>
@@ -149,30 +170,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </DropdownMenuPortal>
               </DropdownMenuSub>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>{t('appShell.userMenu.logout')}</DropdownMenuItem>
+              <DropdownMenuItem>
+                {t('appShell.userMenu.logout')}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </SidebarHeader>
-      </Sidebar>
-
-      <SidebarInset>
-        <header
-          className={cn(
-            'sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm md:hidden'
-          )}
-        >
-          <Link href="/" className="flex items-center gap-2">
-            <NutriSnapLogo className="h-6 w-6 text-primary" />
-            <div className="flex flex-col">
-              <span className="font-headline text-lg font-semibold leading-tight">
-                NutriSnap
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {t('appShell.subtitle')}
-              </span>
-            </div>
-          </Link>
-          <SidebarTrigger />
         </header>
         {children}
       </SidebarInset>

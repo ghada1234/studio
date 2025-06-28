@@ -2,7 +2,8 @@
   "nav": {
     "dashboard": "Dashboard",
     "analyze": "Analyze Meal",
-    "suggestions": "AI Suggestions"
+    "suggestions": "AI Suggestions",
+    "register": "Register"
   },
   "appShell": {
     "subtitle": "Nutritional Snap",
@@ -110,7 +111,7 @@
       "log_success_toast_title": "Meal Logged!",
       "log_success_toast_description": "The analyzed meal has been added to your daily dashboard."
     },
-     "analyzedMealName": "Analyzed Meal"
+    "analyzedMealName": "Analyzed Meal"
   },
   "suggestions": {
     "title": "AI Meal Suggestions",
@@ -151,6 +152,32 @@
     "defaults": {
       "dietaryPreferences": "Anything",
       "nutrientNeeds": "High protein"
+    }
+  },
+  "register": {
+    "title": "Create Account",
+    "card": {
+      "title": "Create a new account",
+      "description": "Fill out the form below to join NutriSnap."
+    },
+    "form": {
+      "name": "Full Name",
+      "name_placeholder": "e.g. John Doe",
+      "email": "Email",
+      "email_placeholder": "e.g. user@example.com",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "button": "Register"
+    },
+    "validation": {
+      "name": "Name is required.",
+      "email": "Please enter a valid email.",
+      "password": "Password must be at least 8 characters.",
+      "confirmPassword": "Passwords do not match."
+    },
+    "toast": {
+      "success_title": "Registered successfully!",
+      "success_description": "Your account has been created. Welcome to NutriSnap!"
     }
   }
 }
