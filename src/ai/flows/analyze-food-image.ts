@@ -20,7 +20,7 @@ const AnalyzeFoodImageInputSchema = z.object({
 });
 export type AnalyzeFoodImageInput = z.infer<typeof AnalyzeFoodImageInputSchema>;
 
-const AnalyzeFoodImageOutputSchema = z.object({
+export const AnalyzeFoodImageOutputSchema = z.object({
   foodItems: z
     .array(z.string())
     .describe('A list of food items identified in the image.'),

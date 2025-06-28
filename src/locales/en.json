@@ -69,9 +69,16 @@
   "analyze": {
     "title": "AI Meal Analysis",
     "header": "AI Meal Analysis",
-    "description": "Upload a picture of your meal and let AI do the hard work.",
+    "description": "Analyze your meal by photo or name and let AI do the hard work.",
+    "methodCard": {
+      "title": "1. Choose Analysis Method",
+      "description": "Analyze a meal by uploading an image or searching for it by name."
+    },
+    "tabs": {
+      "image": "By Image",
+      "search": "By Name"
+    },
     "uploadCard": {
-      "title": "1. Upload Image",
       "description": "Choose a clear picture of your meal.",
       "cta": "Click or drag to upload",
       "button_loading": "Analyzing...",
@@ -79,10 +86,18 @@
       "error_no_file_title": "No file selected",
       "error_no_file_description": "Please select an image to analyze."
     },
+    "searchCard": {
+      "description": "Enter a dish name for a nutritional estimate.",
+      "placeholder": "e.g., Spaghetti Bolognese",
+      "button_loading": "Searching...",
+      "button": "Search Dish",
+      "error_no_dish_title": "No Dish Name Entered",
+      "error_no_dish_description": "Please enter a dish name to search."
+    },
     "reviewCard": {
       "title": "2. Review Analysis",
       "description": "Here's the estimated nutritional information.",
-      "loading": "Analyzing image...",
+      "loading": "Analyzing...",
       "placeholder": "Analysis results will appear here.",
       "identifiedItems": "Identified Food Items",
       "estimatedCalories": "Estimated Calories",
@@ -91,7 +106,7 @@
       "success_toast_title": "Analysis Complete!",
       "success_toast_description": "The estimated nutritional information is now available.",
       "error_toast_title": "Analysis Failed",
-      "error_toast_description": "Could not analyze the image. Please try another one.",
+      "error_toast_description": "Could not analyze the input. Please try again.",
       "log_success_toast_title": "Meal Logged!",
       "log_success_toast_description": "The analyzed meal has been added to your daily dashboard."
     },

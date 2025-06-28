@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { analyzeFoodImage } from '@/ai/flows/analyze-food-image';
+import { analyzeDishName } from '@/ai/flows/analyze-dish-name';
 import {
   Card,
   CardContent,
@@ -9,11 +10,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLog } from '@/hooks/use-daily-log';
-import { Loader2, UploadCloud } from 'lucide-react';
+import { Loader2, UploadCloud, Search } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
@@ -21,21 +28,26 @@ import { useTranslation } from '@/hooks/use-translation';
 export default function AnalyzePage() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [dishName, setDishName] = useState('');
+  const [loadingSource, setLoadingSource] = React.useState<
+    'idle' | 'image' | 'dish'
+  >('idle');
   const [result, setResult] = useState<AnalyzeFoodImageOutput | null>(null);
   const { toast } = useToast();
   const { addMeal } = useDailyLog();
   const { t } = useTranslation();
 
+  const isLoading = loadingSource !== 'idle';
+
   React.useEffect(() => {
     document.title = `${t('analyze.title')} - NutriSnap`;
   }, [t]);
-
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      setDishName(''); // Clear dish name search if file is selected
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
@@ -45,7 +57,7 @@ export default function AnalyzePage() {
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyzeImage = async () => {
     if (!file || !previewUrl) {
       toast({
         title: t('analyze.uploadCard.error_no_file_title'),
@@ -55,7 +67,7 @@ export default function AnalyzePage() {
       return;
     }
 
-    setIsLoading(true);
+    setLoadingSource('image');
     setResult(null);
 
     try {
@@ -75,7 +87,41 @@ export default function AnalyzePage() {
         variant: 'destructive',
       });
     } finally {
-      setIsLoading(false);
+      setLoadingSource('idle');
+    }
+  };
+
+  const handleAnalyzeDishName = async () => {
+    if (!dishName.trim()) {
+      toast({
+        title: t('analyze.searchCard.error_no_dish_title'),
+        description: t('analyze.searchCard.error_no_dish_description'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoadingSource('dish');
+    setResult(null);
+    setFile(null); // Clear file upload state
+    setPreviewUrl(null);
+
+    try {
+      const analysisResult = await analyzeDishName({ dishName });
+      setResult(analysisResult);
+      toast({
+        title: t('analyze.reviewCard.success_toast_title'),
+        description: t('analyze.reviewCard.success_toast_description'),
+      });
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      toast({
+        title: t('analyze.reviewCard.error_toast_title'),
+        description: t('analyze.reviewCard.error_toast_description'),
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingSource('idle');
     }
   };
 
@@ -83,7 +129,8 @@ export default function AnalyzePage() {
     if (!result) return;
 
     addMeal({
-      name: result.foodItems.join(', ') || t('analyze.analyzedMealName'),
+      name:
+        result.foodItems.join(', ') || dishName || t('analyze.analyzedMealName'),
       calories: result.estimatedCalories,
       protein: result.protein,
       carbs: result.carbs,
@@ -107,6 +154,7 @@ export default function AnalyzePage() {
     setResult(null);
     setFile(null);
     setPreviewUrl(null);
+    setDishName('');
   };
 
   return (
@@ -121,51 +169,106 @@ export default function AnalyzePage() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">{t('analyze.uploadCard.title')}</CardTitle>
+            <CardTitle className="font-headline">
+              {t('analyze.methodCard.title')}
+            </CardTitle>
             <CardDescription>
-              {t('analyze.uploadCard.description')}
+              {t('analyze.methodCard.description')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="relative flex h-64 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 transition hover:bg-muted/80">
-              <Input
-                id="file-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
-              />
-              {previewUrl ? (
-                <Image
-                  src={previewUrl}
-                  alt="Meal preview"
-                  fill
-                  style={{ objectFit: 'contain' }}
-                  className="rounded-lg p-2"
-                />
-              ) : (
-                <div className="flex flex-col items-center text-muted-foreground">
-                  <UploadCloud className="mb-2 h-10 w-10" />
-                  <p>{t('analyze.uploadCard.cta')}</p>
+          <CardContent>
+            <Tabs defaultValue="image" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="image">
+                  {t('analyze.tabs.image')}
+                </TabsTrigger>
+                <TabsTrigger value="search">
+                  {t('analyze.tabs.search')}
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="image" className="pt-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t('analyze.uploadCard.description')}
+                  </p>
+                  <div className="relative flex h-64 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 transition hover:bg-muted/80">
+                    <Input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
+                    />
+                    {previewUrl ? (
+                      <Image
+                        src={previewUrl}
+                        alt="Meal preview"
+                        fill
+                        style={{ objectFit: 'contain' }}
+                        className="rounded-lg p-2"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center text-muted-foreground">
+                        <UploadCloud className="mb-2 h-10 w-10" />
+                        <p>{t('analyze.uploadCard.cta')}</p>
+                      </div>
+                    )}
+                  </div>
+                  <Button
+                    onClick={handleAnalyzeImage}
+                    disabled={!file || isLoading}
+                    className="w-full"
+                  >
+                    {loadingSource === 'image' ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    {loadingSource === 'image'
+                      ? t('analyze.uploadCard.button_loading')
+                      : t('analyze.uploadCard.button')}
+                  </Button>
                 </div>
-              )}
-            </div>
-            <Button
-              onClick={handleAnalyze}
-              disabled={!file || isLoading}
-              className="w-full"
-            >
-              {isLoading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              {isLoading ? t('analyze.uploadCard.button_loading') : t('analyze.uploadCard.button')}
-            </Button>
+              </TabsContent>
+              <TabsContent value="search" className="pt-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {t('analyze.searchCard.description')}
+                  </p>
+                  <Input
+                    type="text"
+                    placeholder={t('analyze.searchCard.placeholder')}
+                    value={dishName}
+                    onChange={(e) => {
+                      setDishName(e.target.value);
+                      setFile(null);
+                      setPreviewUrl(null);
+                    }}
+                    className="w-full"
+                  />
+                  <Button
+                    onClick={handleAnalyzeDishName}
+                    disabled={!dishName.trim() || isLoading}
+                    className="w-full"
+                  >
+                    {loadingSource === 'dish' ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Search className="mr-2 h-4 w-4" />
+                    )}
+                    {loadingSource === 'dish'
+                      ? t('analyze.searchCard.button_loading')
+                      : t('analyze.searchCard.button')}
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">{t('analyze.reviewCard.title')}</CardTitle>
+            <CardTitle className="font-headline">
+              {t('analyze.reviewCard.title')}
+            </CardTitle>
             <CardDescription>
               {t('analyze.reviewCard.description')}
             </CardDescription>
@@ -180,45 +283,99 @@ export default function AnalyzePage() {
             {result ? (
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold">{t('analyze.reviewCard.identifiedItems')}</h3>
+                  <h3 className="font-semibold">
+                    {t('analyze.reviewCard.identifiedItems')}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     {result.foodItems.join(', ')}
                   </p>
                 </div>
                 <div>
-                  <h3 className="font-semibold">{t('analyze.reviewCard.estimatedCalories')}</h3>
+                  <h3 className="font-semibold">
+                    {t('analyze.reviewCard.estimatedCalories')}
+                  </h3>
                   <p className="text-sm text-primary font-bold">
                     ~{result.estimatedCalories} {t('dashboard.units.kcal')}
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="font-semibold">{t('analyze.reviewCard.estimatedNutrients')}</h3>
+                  <h3 className="font-semibold">
+                    {t('analyze.reviewCard.estimatedNutrients')}
+                  </h3>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.protein')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.protein?.toFixed(1)} {t('dashboard.units.g')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.carbs')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.carbs?.toFixed(1)} {t('dashboard.units.g')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.fat')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.fat?.toFixed(1)} {t('dashboard.units.g')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.fiber')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.fiber?.toFixed(1)} {t('dashboard.units.g')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.sugar')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.sugar?.toFixed(1)} {t('dashboard.units.g')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.sodium')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.sodium?.toFixed(0)} {t('dashboard.units.mg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.potassium')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.potassium?.toFixed(0)} {t('dashboard.units.mg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.calcium')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.calcium?.toFixed(0)} {t('dashboard.units.mg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.iron')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.iron?.toFixed(1)} {t('dashboard.units.mg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminA')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.vitaminA?.toFixed(0)} {t('dashboard.units.mcg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminC')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.vitaminC?.toFixed(0)} {t('dashboard.units.mg')}</span>
-                    <span className="text-muted-foreground">{t('dashboard.nutrients.vitaminD')}:</span>
-                    <span className="text-left font-medium rtl:text-right">{result.vitaminD?.toFixed(0)} {t('dashboard.units.mcg')}</span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.protein')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.protein?.toFixed(1)} {t('dashboard.units.g')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.carbs')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.carbs?.toFixed(1)} {t('dashboard.units.g')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.fat')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.fat?.toFixed(1)} {t('dashboard.units.g')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.fiber')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.fiber?.toFixed(1)} {t('dashboard.units.g')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.sugar')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.sugar?.toFixed(1)} {t('dashboard.units.g')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.sodium')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.sodium?.toFixed(0)} {t('dashboard.units.mg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.potassium')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.potassium?.toFixed(0)} {t('dashboard.units.mg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.calcium')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.calcium?.toFixed(0)} {t('dashboard.units.mg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.iron')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.iron?.toFixed(1)} {t('dashboard.units.mg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.vitaminA')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.vitaminA?.toFixed(0)} {t('dashboard.units.mcg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.vitaminC')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.vitaminC?.toFixed(0)} {t('dashboard.units.mg')}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {t('dashboard.nutrients.vitaminD')}:
+                    </span>
+                    <span className="text-left font-medium rtl:text-right">
+                      {result.vitaminD?.toFixed(0)} {t('dashboard.units.mcg')}
+                    </span>
                   </div>
                 </div>
 
