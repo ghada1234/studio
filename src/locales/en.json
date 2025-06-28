@@ -8,6 +8,7 @@
     "login": "Login"
   },
   "appShell": {
+    "appName": "NutriSnap",
     "subtitle": "Nutritional Snap",
     "userMenu": {
       "myAccount": "My Account",

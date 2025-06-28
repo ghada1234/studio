@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <NutriSnapLogo className="h-8 w-8 text-primary" />
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <h2 className="font-headline text-2xl font-semibold leading-tight tracking-tighter">
-                NutriSnap
+                {t('appShell.appName')}
               </h2>
               <p className="text-xs text-muted-foreground">
                 {t('appShell.subtitle')}
@@ -126,7 +126,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link href="/" className="flex items-center gap-2 md:hidden">
               <NutriSnapLogo className="h-6 w-6 text-primary" />
               <span className="font-headline text-lg font-semibold leading-tight">
-                NutriSnap
+                {t('appShell.appName')}
               </span>
             </Link>
           </div>

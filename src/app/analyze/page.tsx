@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLog } from '@/hooks/use-daily-log';
-import { Loader2, Search, Camera, CameraReverse } from 'lucide-react';
+import { Loader2, Search, Camera, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
@@ -359,7 +359,7 @@ export default function AnalyzePage() {
                       disabled={hasCameraPermission !== true || isLoading}
                       aria-label="Reverse camera"
                     >
-                      <CameraReverse />
+                      <RefreshCw />
                     </Button>
                   </div>
                 </div>
