@@ -47,7 +47,6 @@ export default function AnalyzePage() {
   const [hasCameraPermission, setHasCameraPermission] = useState<
     boolean | null
   >(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -61,50 +60,50 @@ export default function AnalyzePage() {
     }
   }, [user, authLoading, router, t]);
 
-  const startCamera = async () => {
-    // Stop any existing stream before starting a new one
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-    }
-    try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
-      setStream(newStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
-      }
-      setHasCameraPermission(true);
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      setHasCameraPermission(false);
-      toast({
-        variant: 'destructive',
-        title: t('analyze.cameraCard.error_permission_title'),
-        description: t('analyze.cameraCard.error_permission_description'),
-      });
-    }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-  };
-
   useEffect(() => {
-    if (activeTab === 'camera') {
-      startCamera();
-    } else {
-      stopCamera();
-    }
+    let stream: MediaStream | null = null;
+    const getCameraPermission = async () => {
+      // Only run if the camera tab is active
+      if (activeTab !== 'camera') {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+        }
+        return;
+      }
 
-    return () => {
-      stopCamera();
+      // Reset permission state when tab is activated
+      setHasCameraPermission(null);
+
+      try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        stream = newStream; // Assign to local variable
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: t('analyze.cameraCard.error_permission_title'),
+          description: t('analyze.cameraCard.error_permission_description'),
+        });
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTab]);
+
+    getCameraPermission();
+
+    // Cleanup function
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [activeTab, t, toast]);
 
   if (authLoading || !user) {
     return (
@@ -382,38 +381,40 @@ export default function AnalyzePage() {
                   <p className="text-sm text-muted-foreground">
                     {t('analyze.cameraCard.description')}
                   </p>
-                  <div className="relative flex h-64 w-full items-center justify-center rounded-lg border-2 border-dashed bg-muted/50">
-                    {hasCameraPermission === false ? (
-                      <Alert variant="destructive" className="m-4">
-                        <AlertTitle>
-                          {t('analyze.cameraCard.error_permission_title')}
-                        </AlertTitle>
-                        <AlertDescription>
-                          {t(
-                            'analyze.cameraCard.error_permission_description'
-                          )}
-                        </AlertDescription>
-                      </Alert>
-                    ) : hasCameraPermission === null ? (
-                      <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                        <Loader2 className="h-10 w-10 animate-spin" />
-                      </div>
-                    ) : null}
+                  <div className="relative flex h-64 w-full items-center justify-center overflow-hidden rounded-lg border-2 border-dashed bg-muted/50">
                     <video
                       ref={videoRef}
-                      className={cn(
-                        'h-full w-full rounded-lg object-contain',
-                        hasCameraPermission ? 'block' : 'hidden'
-                      )}
+                      className="h-full w-full object-contain"
                       autoPlay
                       playsInline
                       muted
                     />
+                    {hasCameraPermission === false && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Alert variant="destructive" className="m-4">
+                          <AlertTitle>
+                            {t('analyze.cameraCard.error_permission_title')}
+                          </AlertTitle>
+                          <AlertDescription>
+                            {t(
+                              'analyze.cameraCard.error_permission_description'
+                            )}
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
+                    {hasCameraPermission === null && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                          <Loader2 className="h-10 w-10 animate-spin" />
+                        </div>
+                      </div>
+                    )}
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
                   <Button
                     onClick={handleCaptureAndAnalyze}
-                    disabled={!hasCameraPermission || isLoading}
+                    disabled={hasCameraPermission !== true || isLoading}
                     className="w-full"
                   >
                     {loadingSource === 'image' ? (
