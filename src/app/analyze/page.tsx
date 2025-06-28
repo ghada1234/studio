@@ -64,8 +64,7 @@ export default function AnalyzePage() {
       console.error('Analysis failed:', error);
       toast({
         title: 'Analysis Failed',
-        description:
-          'Could not analyze the image. Please try another one.',
+        description: 'Could not analyze the image. Please try another one.',
         variant: 'destructive',
       });
     } finally {
@@ -76,18 +75,22 @@ export default function AnalyzePage() {
   const handleAddMeal = () => {
     if (!result) return;
 
-    // A simple heuristic to extract macros from the description string
-    const proteinMatch = result.estimatedNutritionalContent.match(/protein:\s*~?(\d+)\s*g/i);
-    const carbsMatch = result.estimatedNutritionalContent.match(/carbohydrates:\s*~?(\d+)\s*g/i);
-    const fatMatch = result.estimatedNutritionalContent.match(/fat:\s*~?(\d+)\s*g/i);
-    
     addMeal({
       name: result.foodItems.join(', ') || 'Analyzed Meal',
       calories: result.estimatedCalories,
-      protein: proteinMatch ? parseInt(proteinMatch[1]) : 0,
-      carbs: carbsMatch ? parseInt(carbsMatch[1]) : 0,
-      fat: fatMatch ? parseInt(fatMatch[1]) : 0,
-      imageUrl: previewUrl || undefined
+      protein: result.protein,
+      carbs: result.carbs,
+      fat: result.fat,
+      fiber: result.fiber,
+      sugar: result.sugar,
+      sodium: result.sodium,
+      potassium: result.potassium,
+      calcium: result.calcium,
+      iron: result.iron,
+      vitaminA: result.vitaminA,
+      vitaminC: result.vitaminC,
+      vitaminD: result.vitaminD,
+      imageUrl: previewUrl || undefined,
     });
 
     toast({
@@ -102,7 +105,9 @@ export default function AnalyzePage() {
   return (
     <div className="flex flex-col gap-8 p-4 sm:p-6 md:p-8">
       <header>
-        <h1 className="font-headline text-4xl font-bold">Analyze Meal with AI</h1>
+        <h1 className="font-headline text-4xl font-bold">
+          Analyze Meal with AI
+        </h1>
         <p className="text-muted-foreground">
           Upload a photo of your meal and let our AI do the heavy lifting.
         </p>
@@ -181,13 +186,41 @@ export default function AnalyzePage() {
                     ~{result.estimatedCalories} kcal
                   </p>
                 </div>
-                <div>
-                  <h3 className="font-semibold">Estimated Nutritional Content</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {result.estimatedNutritionalContent}
-                  </p>
+
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Estimated Nutrients</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    <span className="text-muted-foreground">Protein:</span>
+                    <span className="text-right font-medium">{result.protein?.toFixed(1)} g</span>
+                    <span className="text-muted-foreground">Carbs:</span>
+                    <span className="text-right font-medium">{result.carbs?.toFixed(1)} g</span>
+                    <span className="text-muted-foreground">Fat:</span>
+                    <span className="text-right font-medium">{result.fat?.toFixed(1)} g</span>
+                    <span className="text-muted-foreground">Fiber:</span>
+                    <span className="text-right font-medium">{result.fiber?.toFixed(1)} g</span>
+                     <span className="text-muted-foreground">Sugar:</span>
+                    <span className="text-right font-medium">{result.sugar?.toFixed(1)} g</span>
+                    <span className="text-muted-foreground">Sodium:</span>
+                    <span className="text-right font-medium">{result.sodium?.toFixed(0)} mg</span>
+                    <span className="text-muted-foreground">Potassium:</span>
+                    <span className="text-right font-medium">{result.potassium?.toFixed(0)} mg</span>
+                    <span className="text-muted-foreground">Calcium:</span>
+                    <span className="text-right font-medium">{result.calcium?.toFixed(0)} mg</span>
+                    <span className="text-muted-foreground">Iron:</span>
+                    <span className="text-right font-medium">{result.iron?.toFixed(1)} mg</span>
+                    <span className="text-muted-foreground">Vitamin A:</span>
+                    <span className="text-right font-medium">{result.vitaminA?.toFixed(0)} mcg</span>
+                    <span className="text-muted-foreground">Vitamin C:</span>
+                    <span className="text-right font-medium">{result.vitaminC?.toFixed(0)} mg</span>
+                    <span className="text-muted-foreground">Vitamin D:</span>
+                    <span className="text-right font-medium">{result.vitaminD?.toFixed(0)} mcg</span>
+                  </div>
                 </div>
-                <Button onClick={handleAddMeal} className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+
+                <Button
+                  onClick={handleAddMeal}
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                >
                   Add to Daily Log
                 </Button>
               </div>

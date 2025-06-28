@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,6 +33,15 @@ const formSchema = z.object({
   protein: z.coerce.number().min(0, { message: 'Protein must be positive.' }),
   carbs: z.coerce.number().min(0, { message: 'Carbs must be positive.' }),
   fat: z.coerce.number().min(0, { message: 'Fat must be positive.' }),
+  fiber: z.coerce.number().min(0).optional(),
+  sugar: z.coerce.number().min(0).optional(),
+  sodium: z.coerce.number().min(0).optional(),
+  potassium: z.coerce.number().min(0).optional(),
+  calcium: z.coerce.number().min(0).optional(),
+  iron: z.coerce.number().min(0).optional(),
+  vitaminA: z.coerce.number().min(0).optional(),
+  vitaminC: z.coerce.number().min(0).optional(),
+  vitaminD: z.coerce.number().min(0).optional(),
 });
 
 export default function AddMealPage() {
@@ -49,6 +57,15 @@ export default function AddMealPage() {
       protein: 0,
       carbs: 0,
       fat: 0,
+      fiber: 0,
+      sugar: 0,
+      sodium: 0,
+      potassium: 0,
+      calcium: 0,
+      iron: 0,
+      vitaminA: 0,
+      vitaminC: 0,
+      vitaminD: 0,
     },
   });
 
@@ -87,68 +104,205 @@ export default function AddMealPage() {
                   <FormItem>
                     <FormLabel>Meal Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Grilled Chicken Salad" {...field} />
+                      <Input
+                        placeholder="e.g., Grilled Chicken Salad"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                <FormField
-                  control={form.control}
-                  name="calories"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Calories (kcal)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="250" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="protein"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Protein (g)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="30" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="carbs"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Carbohydrates (g)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="10" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="fat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fat (g)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="15" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+              <div className="space-y-4 rounded-lg border p-4">
+                <h3 className="text-lg font-medium leading-none">
+                  Macronutrients
+                </h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <FormField
+                    control={form.control}
+                    name="calories"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Calories (kcal)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="250" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="protein"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Protein (g)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="30" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="carbs"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Carbohydrates (g)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="10" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="fat"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fat (g)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="15" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="fiber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fiber (g)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="5" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="sugar"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sugar (g)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="3" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
 
-              <Button type="submit" className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <div className="space-y-4 rounded-lg border p-4">
+                <h3 className="text-lg font-medium leading-none">
+                  Micronutrients
+                </h3>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  <FormField
+                    control={form.control}
+                    name="sodium"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Sodium (mg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="500" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="potassium"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Potassium (mg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="300" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="calcium"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Calcium (mg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="100" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="iron"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Iron (mg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="2" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vitaminA"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vitamin A (mcg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="150" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vitaminC"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vitamin C (mg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="50" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="vitaminD"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vitamin D (mcg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="5" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="bg-accent text-accent-foreground hover:bg-accent/90"
+              >
                 Add Meal to Log
               </Button>
             </form>

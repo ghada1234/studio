@@ -21,15 +21,34 @@ const AnalyzeFoodImageInputSchema = z.object({
 export type AnalyzeFoodImageInput = z.infer<typeof AnalyzeFoodImageInputSchema>;
 
 const AnalyzeFoodImageOutputSchema = z.object({
-  foodItems: z.array(z.string()).describe('A list of food items identified in the image.'),
-  estimatedNutritionalContent: z
-    .string()
-    .describe('An estimation of the nutritional content of the meal.'),
+  foodItems: z
+    .array(z.string())
+    .describe('A list of food items identified in the image.'),
   estimatedCalories: z.number().describe('Estimation of calories in the meal'),
+  // Macronutrients (in grams)
+  protein: z.number().describe('Estimated protein in grams.'),
+  carbs: z.number().describe('Estimated carbohydrates in grams.'),
+  fat: z.number().describe('Estimated fat in grams.'),
+  fiber: z.number().describe('Estimated fiber in grams.'),
+  sugar: z.number().describe('Estimated sugar in grams.'),
+  // Key Micronutrients
+  sodium: z.number().describe('Estimated sodium in milligrams (mg).'),
+  potassium: z.number().describe('Estimated potassium in milligrams (mg).'),
+  calcium: z.number().describe('Estimated calcium in milligrams (mg).'),
+  iron: z.number().describe('Estimated iron in milligrams (mg).'),
+  vitaminA: z
+    .number()
+    .describe('Estimated Vitamin A in micrograms (mcg) RAE.'),
+  vitaminC: z.number().describe('Estimated Vitamin C in milligrams (mg).'),
+  vitaminD: z.number().describe('Estimated Vitamin D in micrograms (mcg).'),
 });
-export type AnalyzeFoodImageOutput = z.infer<typeof AnalyzeFoodImageOutputSchema>;
+export type AnalyzeFoodImageOutput = z.infer<
+  typeof AnalyzeFoodImageOutputSchema
+>;
 
-export async function analyzeFoodImage(input: AnalyzeFoodImageInput): Promise<AnalyzeFoodImageOutput> {
+export async function analyzeFoodImage(
+  input: AnalyzeFoodImageInput
+): Promise<AnalyzeFoodImageOutput> {
   return analyzeFoodImageFlow(input);
 }
 
@@ -37,15 +56,18 @@ const prompt = ai.definePrompt({
   name: 'analyzeFoodImagePrompt',
   input: {schema: AnalyzeFoodImageInputSchema},
   output: {schema: AnalyzeFoodImageOutputSchema},
-  prompt: `You are a nutritional expert. Analyze the food image provided to identify the food items and estimate its nutritional content.
+  prompt: `You are a nutritional expert. Analyze the food image provided.
 
-  Photo: {{media url=photoDataUri}}
+Photo: {{media url=photoDataUri}}
 
-  Identify the food items, provide an estimation of the macro and micro nutrient content, and provide an estimate of the total calories in the meal.
-  Output the food items as a list of strings in the foodItems field.
-  Output the nutritional content as a string in the estimatedNutritionalContent field.  Include both macro and micro nutrients.
-  Output the estimated calories as a number in the estimatedCalories field.
-  `,
+Identify the food items in the image.
+Provide an estimation of the total calories.
+Provide an estimation for the following nutrients:
+- Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
+- Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
+
+Return the data in the specified JSON format.
+`,
 });
 
 const analyzeFoodImageFlow = ai.defineFlow(
@@ -54,7 +76,7 @@ const analyzeFoodImageFlow = ai.defineFlow(
     inputSchema: AnalyzeFoodImageInputSchema,
     outputSchema: AnalyzeFoodImageOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await prompt(input);
     return output!;
   }
