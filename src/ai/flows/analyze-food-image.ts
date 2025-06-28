@@ -18,6 +18,10 @@ const AnalyzeFoodImageInputSchema = z.object({
     .describe(
       "A photo of a meal, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  portionSize: z
+    .string()
+    .optional()
+    .describe('The estimated portion size of the meal, e.g., "1 cup", "100g", "a small plate".'),
 });
 export type AnalyzeFoodImageInput = z.infer<typeof AnalyzeFoodImageInputSchema>;
 
@@ -41,6 +45,13 @@ const prompt = ai.definePrompt({
 Photo: {{media url=photoDataUri}}
 
 Identify the food items in the image. If you cannot identify a food item, state that it is an "unidentified food item".
+
+{{#if portionSize}}
+The user has specified a portion size of: {{{portionSize}}}. Please adjust the nutritional information to match this portion size.
+{{else}}
+Visually estimate the portion size from the image, using common objects for scale if visible (like a fork or a hand), and base your nutritional analysis on that estimation. If no scale is available, assume a standard, single serving portion.
+{{/if}}
+
 Provide an estimation of the total calories.
 Provide an estimation for the following nutrients:
 - Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.

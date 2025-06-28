@@ -95,6 +95,7 @@
     "searchCard": {
       "description": "Enter a dish name for a nutritional estimate.",
       "placeholder": "e.g., Spaghetti Bolognese",
+      "portion_placeholder": "Portion size (e.g., 1 cup, 100g)",
       "button_loading": "Searching...",
       "button": "Search Dish",
       "error_no_dish_title": "No Dish Name Entered",
@@ -102,6 +103,7 @@
     },
     "cameraCard": {
       "description": "Point your camera at the meal and snap a picture.",
+      "portion_placeholder": "Portion size (optional)",
       "button_loading": "Analyzing...",
       "button": "Capture & Analyze",
       "error_permission_title": "Camera Access Denied",

@@ -18,6 +18,10 @@ const AnalyzeDishNameInputSchema = z.object({
     .describe(
       "The name of a meal, e.g., 'Chicken Caesar Salad' or 'Spaghetti Bolognese'."
     ),
+  portionSize: z
+    .string()
+    .optional()
+    .describe('The estimated portion size of the meal, e.g., "1 cup", "100g", "a small plate".'),
 });
 export type AnalyzeDishNameInput = z.infer<typeof AnalyzeDishNameInputSchema>;
 
@@ -35,7 +39,13 @@ const prompt = ai.definePrompt({
   output: {schema: FoodAnalysisOutputSchema},
   prompt: `You are a nutritional expert with a vast knowledge of international cuisine, including dishes from all over the world such as the Middle East (Iraq, Lebanon, Syria, Yemen, UAE, etc.), Asia, Europe, Africa, and the Americas. Analyze the dish name provided: {{{dishName}}}.
 
-Based on a typical preparation of this dish, provide an estimation of the total calories and the following nutrients:
+{{#if portionSize}}
+The user has specified a portion size of: {{{portionSize}}}. Please adjust the nutritional information accordingly.
+{{else}}
+Assume a standard, single serving portion size.
+{{/if}}
+
+Based on the specified or a standard preparation of this dish, provide an estimation of the total calories and the following nutrients:
 - Macronutrients (in grams): protein, carbohydrates, fat, fiber, sugar.
 - Key Micronutrients: sodium (mg), potassium (mg), calcium (mg), iron (mg), Vitamin A (mcg RAE), Vitamin C (mg), Vitamin D (mcg).
 

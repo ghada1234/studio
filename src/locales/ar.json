@@ -95,6 +95,7 @@
     "searchCard": {
       "description": "أدخل اسم طبق للحصول على تقدير غذائي.",
       "placeholder": "مثال: سباغيتي بولونيز",
+      "portion_placeholder": "حجم الحصة (مثال: 1 كوب، 100 جرام)",
       "button_loading": "جاري البحث...",
       "button": "ابحث عن الطبق",
       "error_no_dish_title": "لم يتم إدخال اسم الطبق",
@@ -102,6 +103,7 @@
     },
     "cameraCard": {
       "description": "وجّه الكاميرا نحو وجبتك والتقط صورة.",
+      "portion_placeholder": "حجم الحصة (اختياري)",
       "button_loading": "يتم التحليل...",
       "button": "التقاط وتحليل",
       "error_permission_title": "تم رفض الوصول إلى الكاميرا",

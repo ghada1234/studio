@@ -33,6 +33,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 export default function AnalyzePage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dishName, setDishName] = useState('');
+  const [portionSize, setPortionSize] = useState('');
   const [loadingSource, setLoadingSource] = React.useState<
     'idle' | 'image' | 'dish'
   >('idle');
@@ -108,7 +109,7 @@ export default function AnalyzePage() {
     );
   }
 
-  const analyzeImageDataUri = async (dataUri: string) => {
+  const analyzeImageDataUri = async (dataUri: string, portion: string) => {
     if (!dataUri) return;
 
     setLoadingSource('image');
@@ -117,6 +118,7 @@ export default function AnalyzePage() {
     try {
       const analysisResult = await analyzeFoodImage({
         photoDataUri: dataUri,
+        portionSize: portion || undefined,
       });
       setResult(analysisResult);
       toast({
@@ -150,7 +152,7 @@ export default function AnalyzePage() {
     setPreviewUrl(null);
 
     try {
-      const analysisResult = await analyzeDishName({ dishName });
+      const analysisResult = await analyzeDishName({ dishName, portionSize });
       setResult(analysisResult);
       toast({
         title: t('analyze.reviewCard.success_toast_title'),
@@ -190,7 +192,7 @@ export default function AnalyzePage() {
       const dataUri = canvas.toDataURL('image/jpeg');
       setPreviewUrl(dataUri);
       setDishName('');
-      await analyzeImageDataUri(dataUri);
+      await analyzeImageDataUri(dataUri, portionSize);
     }
   };
 
@@ -225,6 +227,7 @@ export default function AnalyzePage() {
     setResult(null);
     setPreviewUrl(null);
     setDishName('');
+    setPortionSize('');
   };
 
   return (
@@ -279,6 +282,13 @@ export default function AnalyzePage() {
                       setDishName(e.target.value);
                       setPreviewUrl(null);
                     }}
+                    className="w-full"
+                  />
+                  <Input
+                    type="text"
+                    placeholder={t('analyze.searchCard.portion_placeholder')}
+                    value={portionSize}
+                    onChange={(e) => setPortionSize(e.target.value)}
                     className="w-full"
                   />
                   <Button
@@ -338,6 +348,13 @@ export default function AnalyzePage() {
                     )}
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
+                   <Input
+                    type="text"
+                    placeholder={t('analyze.cameraCard.portion_placeholder')}
+                    value={portionSize}
+                    onChange={(e) => setPortionSize(e.target.value)}
+                    className="w-full"
+                  />
                   <div className="flex gap-2">
                     <Button
                       onClick={handleCaptureAndAnalyze}
