@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useDailyLog } from '@/hooks/use-daily-log';
-import { Loader2, UploadCloud, Search, Camera } from 'lucide-react';
+import { Loader2, Search, Camera, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import type { AnalyzeFoodImageOutput } from '@/ai/flows/analyze-food-image';
 import { useTranslation } from '@/hooks/use-translation';
@@ -31,7 +31,6 @@ import { cn } from '@/lib/utils';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 export default function AnalyzePage() {
-  const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dishName, setDishName] = useState('');
   const [loadingSource, setLoadingSource] = React.useState<
@@ -43,10 +42,13 @@ export default function AnalyzePage() {
   const { t, dir } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('image');
+  const [activeTab, setActiveTab] = useState('search');
   const [hasCameraPermission, setHasCameraPermission] = useState<
     boolean | null
   >(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>(
+    'environment'
+  );
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -76,7 +78,7 @@ export default function AnalyzePage() {
 
       try {
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode },
         });
         stream = newStream; // Assign to local variable
         setHasCameraPermission(true);
@@ -103,7 +105,7 @@ export default function AnalyzePage() {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [activeTab, t, toast]);
+  }, [activeTab, t, toast, facingMode]);
 
   if (authLoading || !user) {
     return (
@@ -112,20 +114,6 @@ export default function AnalyzePage() {
       </div>
     );
   }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setDishName(''); // Clear dish name search if file is selected
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-      setResult(null);
-    }
-  };
 
   const analyzeImageDataUri = async (dataUri: string) => {
     if (!dataUri) return;
@@ -154,19 +142,6 @@ export default function AnalyzePage() {
     }
   };
 
-  const handleAnalyzeImage = async () => {
-    if (!file || !previewUrl) {
-      toast({
-        title: t('analyze.uploadCard.error_no_file_title'),
-        description: t('analyze.uploadCard.error_no_file_description'),
-        variant: 'destructive',
-      });
-      return;
-    }
-    setDishName('');
-    await analyzeImageDataUri(previewUrl);
-  };
-
   const handleAnalyzeDishName = async () => {
     if (!dishName.trim()) {
       toast({
@@ -179,7 +154,6 @@ export default function AnalyzePage() {
 
     setLoadingSource('dish');
     setResult(null);
-    setFile(null);
     setPreviewUrl(null);
 
     try {
@@ -212,8 +186,7 @@ export default function AnalyzePage() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUri = canvas.toDataURL('image/jpeg');
       setPreviewUrl(dataUri);
-      setFile(null); // Unset file if we are using camera
-      setDishName(''); // Unset dish name
+      setDishName('');
       await analyzeImageDataUri(dataUri);
     }
   };
@@ -247,7 +220,6 @@ export default function AnalyzePage() {
       description: t('analyze.reviewCard.log_success_toast_description'),
     });
     setResult(null);
-    setFile(null);
     setPreviewUrl(null);
     setDishName('');
   };
@@ -273,17 +245,11 @@ export default function AnalyzePage() {
           </CardHeader>
           <CardContent>
             <Tabs
-              defaultValue="image"
+              defaultValue="search"
               className="w-full"
               onValueChange={setActiveTab}
             >
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="image">
-                  <UploadCloud
-                    className={cn('h-4 w-4', dir === 'ltr' ? 'mr-2' : 'ml-2')}
-                  />
-                  {t('analyze.tabs.image')}
-                </TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="search">
                   <Search
                     className={cn('h-4 w-4', dir === 'ltr' ? 'mr-2' : 'ml-2')}
@@ -297,48 +263,6 @@ export default function AnalyzePage() {
                   {t('analyze.tabs.camera')}
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="image" className="pt-4">
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    {t('analyze.uploadCard.description')}
-                  </p>
-                  <div className="relative flex h-64 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 transition hover:bg-muted/80">
-                    <Input
-                      id="file-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
-                    />
-                    {previewUrl && activeTab === 'image' ? (
-                      <Image
-                        src={previewUrl}
-                        alt="Meal preview"
-                        fill
-                        style={{ objectFit: 'contain' }}
-                        className="rounded-lg p-2"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center text-muted-foreground">
-                        <UploadCloud className="mb-2 h-10 w-10" />
-                        <p>{t('analyze.uploadCard.cta')}</p>
-                      </div>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleAnalyzeImage}
-                    disabled={!file || isLoading}
-                    className="w-full"
-                  >
-                    {loadingSource === 'image' && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {loadingSource === 'image'
-                      ? t('analyze.uploadCard.button_loading')
-                      : t('analyze.uploadCard.button')}
-                  </Button>
-                </div>
-              </TabsContent>
               <TabsContent value="search" className="pt-4">
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
@@ -350,7 +274,6 @@ export default function AnalyzePage() {
                     value={dishName}
                     onChange={(e) => {
                       setDishName(e.target.value);
-                      setFile(null);
                       setPreviewUrl(null);
                     }}
                     className="w-full"
@@ -412,18 +335,33 @@ export default function AnalyzePage() {
                     )}
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
-                  <Button
-                    onClick={handleCaptureAndAnalyze}
-                    disabled={hasCameraPermission !== true || isLoading}
-                    className="w-full"
-                  >
-                    {loadingSource === 'image' ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : null}
-                    {loadingSource === 'image'
-                      ? t('analyze.cameraCard.button_loading')
-                      : t('analyze.cameraCard.button')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleCaptureAndAnalyze}
+                      disabled={hasCameraPermission !== true || isLoading}
+                      className="w-full"
+                    >
+                      {loadingSource === 'image' ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      {loadingSource === 'image'
+                        ? t('analyze.cameraCard.button_loading')
+                        : t('analyze.cameraCard.button')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setFacingMode((prev) =>
+                          prev === 'user' ? 'environment' : 'user'
+                        )
+                      }
+                      disabled={hasCameraPermission !== true || isLoading}
+                      aria-label="Reverse camera"
+                    >
+                      <RefreshCw />
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
@@ -448,6 +386,16 @@ export default function AnalyzePage() {
             )}
             {result ? (
               <div className="space-y-4">
+                {previewUrl && (
+                  <div className="relative h-48 w-full overflow-hidden rounded-lg">
+                    <Image
+                      src={previewUrl}
+                      alt="Analyzed meal"
+                      fill
+                      style={{ objectFit: 'cover' }}
+                    />
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold">
                     {t('analyze.reviewCard.identifiedItems')}
