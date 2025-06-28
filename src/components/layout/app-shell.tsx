@@ -1,0 +1,147 @@
+'use client';
+
+import * as React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  BrainCircuit,
+  Camera,
+  LayoutDashboard,
+  PlusCircle,
+} from 'lucide-react';
+
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarInset,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
+import { Button } from '../ui/button';
+import { NutriSnapLogo } from '../icons';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
+
+const navItems = [
+  {
+    href: '/',
+    icon: LayoutDashboard,
+    label: 'Dashboard',
+  },
+  {
+    href: '/analyze',
+    icon: Camera,
+    label: 'Analyze Meal',
+  },
+  {
+    href: '/add-meal',
+    icon: PlusCircle,
+    label: 'Add Meal',
+  },
+  {
+    href: '/suggestions',
+    icon: BrainCircuit,
+    label: 'AI Suggestions',
+  },
+];
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  return (
+    <SidebarProvider>
+      <Sidebar
+        variant="inset"
+        className="bg-sidebar text-sidebar-foreground border-sidebar-border"
+      >
+        <SidebarHeader className="border-b border-sidebar-border p-4">
+          <Link href="/" className="flex items-center gap-3">
+            <NutriSnapLogo className="h-8 w-8 text-primary" />
+            <h2 className="font-headline text-2xl font-semibold tracking-tighter group-data-[collapsible=icon]:hidden">
+              NutriSnap
+            </h2>
+          </Link>
+        </SidebarHeader>
+
+        <SidebarContent className="p-2">
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === item.href}
+                  tooltip={{
+                    children: item.label,
+                    className: 'font-body',
+                  }}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+
+        <SidebarHeader className="mt-auto border-t border-sidebar-border p-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex w-full items-center justify-start gap-3 p-2 hover:bg-sidebar-accent"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="https://placehold.co/100x100.png" alt="User" data-ai-hint="person avatar"/>
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+                <div className="text-left group-data-[collapsible=icon]:hidden">
+                  <p className="text-sm font-medium">User</p>
+                  <p className="text-xs text-muted-foreground">
+                    user@nutrisnap.app
+                  </p>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarHeader>
+      </Sidebar>
+
+      <SidebarInset>
+        <header
+          className={cn(
+            'sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background/80 px-4 backdrop-blur-sm md:hidden'
+          )}
+        >
+          <Link href="/" className="flex items-center gap-2 font-headline text-lg font-semibold">
+             <NutriSnapLogo className="h-6 w-6 text-primary" />
+             NutriSnap
+          </Link>
+          <SidebarTrigger />
+        </header>
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
+  );
+}
