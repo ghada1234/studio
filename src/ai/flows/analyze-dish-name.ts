@@ -10,10 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {
-  AnalyzeFoodImageOutputSchema,
-  type AnalyzeFoodImageOutput,
-} from './analyze-food-image';
+import { FoodAnalysisOutputSchema } from '../schemas';
 
 const AnalyzeDishNameInputSchema = z.object({
   dishName: z
@@ -24,7 +21,7 @@ const AnalyzeDishNameInputSchema = z.object({
 });
 export type AnalyzeDishNameInput = z.infer<typeof AnalyzeDishNameInputSchema>;
 
-export type AnalyzeDishNameOutput = AnalyzeFoodImageOutput;
+export type AnalyzeDishNameOutput = z.infer<typeof FoodAnalysisOutputSchema>;
 
 export async function analyzeDishName(
   input: AnalyzeDishNameInput
@@ -35,7 +32,7 @@ export async function analyzeDishName(
 const prompt = ai.definePrompt({
   name: 'analyzeDishNamePrompt',
   input: {schema: AnalyzeDishNameInputSchema},
-  output: {schema: AnalyzeFoodImageOutputSchema},
+  output: {schema: FoodAnalysisOutputSchema},
   prompt: `You are a nutritional expert. Analyze the dish name provided: {{{dishName}}}.
 
 Based on a typical preparation of this dish, provide an estimation of the total calories and the following nutrients:
@@ -52,7 +49,7 @@ const analyzeDishNameFlow = ai.defineFlow(
   {
     name: 'analyzeDishNameFlow',
     inputSchema: AnalyzeDishNameInputSchema,
-    outputSchema: AnalyzeFoodImageOutputSchema,
+    outputSchema: FoodAnalysisOutputSchema,
   },
   async (input) => {
     const {output} = await prompt(input);
